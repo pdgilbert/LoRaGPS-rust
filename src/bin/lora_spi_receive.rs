@@ -20,10 +20,10 @@
 #![no_std]
 #![no_main]
 
-#[cfg(debug_assertions)]
+#[cfg(debug)]
 use panic_semihosting;
 
-#[cfg(not(debug_assertions))]
+#[cfg(not(debug))]
 use panic_halt;
 
 use core::convert::Infallible;

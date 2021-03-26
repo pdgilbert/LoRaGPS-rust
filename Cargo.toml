@@ -1,5 +1,5 @@
 [package]
-name = "LoRaGPS-rust"
+name = "lora_gps"
 version = "0.1.0"
 authors = ["Paul Gilbert <pdgilbert@users.noreply.github.com>"]
 edition = "2018"
@@ -13,15 +13,18 @@ readme = "README.md"
 test = true
 
 [[bin]]
-name = "lora_spi_send.rs"
+name = "lora_spi_send"
+path = "src/bin/lora_spi_send.rs"
 
 [[bin]]
-name = "lora_spi_gps.rs"
+name = "lora_spi_receive"
+path = "src/bin/lora_spi_receive.rs"
+
+[[bin]]
+name = "lora_spi_gps"
+path = "src/bin/lora_spi_gps.rs"
 #test = false
 #bench = false
-
-[[bin]]
-name = "lora_spi_send.rs"
 
 #[[example]]
 #name = "sendTestCHxx"
@@ -61,6 +64,12 @@ stm32l4xx-hal = { git = "https://github.com/stm32-rs/stm32l4xx-hal", optional = 
 
 # for bugs and unusual return values in some hals
 void          = { version = ">=1.0.2", default-features = false }
+heapless = ">=0.4.3"
+
+cortex-m-semihosting = { version = ">=0.3.3" }
+panic-semihosting    = { version = ">=0.5.2" }
+
+#[dev-dependencies]
 
 [features]
 stm32f0xx = []
@@ -93,17 +102,13 @@ stm32l151 = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]
 stm32l4x1 = ["stm32l4xx-hal/stm32l4x1", "stm32l4xx-hal/rt"]
 stm32l4x2 = ["stm32l4xx-hal/stm32l4x2", "stm32l4xx-hal/rt"]
 
-[dev-dependencies]
-cortex-m-semihosting = { version = ">=0.3.3" }
-panic-semihosting    = { version = ">=0.5.2" }
-heapless = ">=0.4.3"
-
 [profile.dev]
 incremental = false
 codegen-units = 1
+debug = true
 
 [profile.release]
 codegen-units = 1
-debug = true
+debug = false
 lto = true
 
