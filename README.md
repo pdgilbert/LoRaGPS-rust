@@ -4,7 +4,7 @@ This crate compiles Rust code into binaries to run on MCUs with no OS.
 See [repo LoRaGPS](https://github.com/pdgilbert/LoRaGPS) for similar Python code that 
 runs on Raspberry Pi (and like) devices with an OS. 
 
-See [repo eg_stm_hal(https://github.com/pdgilbert/eg_stm_hal) for examples of other sensors and
+See [repo eg_stm_hal](https://github.com/pdgilbert/eg_stm_hal) for examples of other sensors and
 [a summary of their status.](https://pdgilbert.github.io/eg_stm_hal/).
 
 
@@ -59,6 +59,13 @@ actually need the specific `MCU`.
   export HAL=stm32l1xx MCU=stm32l151   TARGET=thumbv7m-none-eabi    PROC=stm32l1   # heltec-lora-node151 Cortex-M3
   export HAL=stm32l4xx MCU=stm32l4x2   TARGET=thumbv7em-none-eabi   PROC=stm32l4x  # none-stm32l4x1      Cortex-M4
 ```
+
+Note that there can be conflicting versions of the binary files produced in `target/$TARGET` because 
+the directory is only specific to the MCU triple, not to the actual MCU. 
+For example, `blackpill-stm32f401` and `blackpill-stm32f411` are linked with different memory maps but are 
+generated in the same directroy, so the last compile $MCU setting will determine what is in the directory.
+See directories in `memoryMaps/`  to find the `memory.x` files. 
+The use of these is controlled by the `build.rs` script, which is called by `cargo`.
 
 ## Running 
  
