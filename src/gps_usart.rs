@@ -1,8 +1,8 @@
-//#[cfg(debug_assertions)]
-//use panic_semihosting;
+#[cfg(debug_assertions)]
+use panic_semihosting as _;
 
 #[cfg(not(debug_assertions))]
-use panic_halt;
+use panic_halt as _;
 
 use core::convert::Infallible;
 
