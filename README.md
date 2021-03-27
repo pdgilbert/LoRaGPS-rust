@@ -1,13 +1,10 @@
-# Send GPS info over LoRa - embedded Rust (nostd)
+## Send GPS info over LoRa - embedded Rust (no_std)
 
-## Preamble
-
-pre-alpha.  JUST SETTING UP
 This crate compiles Rust code into binaries to run on MCUs with no OS. 
-See [repo LoRaGPS](https://pdgilbert.github.io/LoRaGPS/) for similar Python code that 
+See [repo LoRaGPS](https://github.com/pdgilbert/LoRaGPS) for similar Python code that 
 runs on Raspberry Pi (and like) devices with an OS. 
 
-See [repo eg_stm_hal(https://pdgilbert.github.io/eg_stm_hal/) for examples of other sensors and
+See [repo eg_stm_hal(https://github.com/pdgilbert/eg_stm_hal) for examples of other sensors and
 [a summary of their status.](https://pdgilbert.github.io/eg_stm_hal/).
 
 
@@ -26,7 +23,6 @@ See [repo eg_stm_hal(https://pdgilbert.github.io/eg_stm_hal/) for examples of ot
 | lora_spi_receive | receive  a character string over LoRa,  + semihost output  |
 | lora_spi_gps     | read gps and transmit over LoRa,  + semihost output        |
 
-The current status of these examples is [here.](https://pdgilbert.github.io/eg_stm_hal/#additional-examples)
 
 ## Building
 
@@ -35,6 +31,9 @@ cargo build  --target $TARGET  --features $HAL,$MCU
 cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_send
 cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_receive
 cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_gps
+
+cargo test  --target $TARGET  --features $HAL,$MCU
+
 ```
 where  `TARGET`, `HAL`  and `MCU` are environment variables for your processor. 
 Variables `HAL`  and `MCU` overlap. It should be possible to determine  `HAL`  based on `MCU`.
@@ -69,11 +68,20 @@ actually need the specific `MCU`.
     export INTERFACE=stlink-v2-1  
 ```
 
+Using openocd  to load compiled code to the MCU and for semihost or debugging:
+
 ```
 openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
 ```
 
-cargo  run --target $TARGET --features $HAL,$MCU  xxx
+In a separate window one of
+
+```
+cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_send
+cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_receive
+cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_gps
+
+```
 
 ## License
 
