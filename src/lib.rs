@@ -10,7 +10,6 @@ pub mod gps_usart;
 pub mod lora_spi;
 pub mod lora_spi_rcv;
 
-
 // consider putting some real tests here
 
 #[test]
