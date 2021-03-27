@@ -13,13 +13,10 @@ use embedded_hal::blocking::delay::DelayMs;
 // When passing the older hal crate objects to the newer rust-radio-sx127x methods
 // the objects are appended with .compat().
 
-//use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
 use embedded_hal_compat::IntoCompat;
 
 // MODE needs the old version as it is passed to the device hal crates
-//use embedded_hal::spi::{Mode, Phase, Polarity};
 use old_e_h::spi::{Mode, Phase, Polarity};
-
 
 use radio_sx127x::Error as sx127xError; // Error name conflict with hals
 use radio_sx127x::{

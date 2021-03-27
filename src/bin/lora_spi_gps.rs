@@ -1,19 +1,7 @@
 //! Serial interface read GPS on usart and transmit with LoRa using crate radio_sx127x (on SPI).
-//! This example is similar to gps_rw,  lora_gps_rw and  lora_spi_send.
-//! See the MCU device setup() sections for details on pin connections.
-
-//https://www.rfwireless-world.com/Tutorials/LoRa-channels-list.html
-// channels are as follows
-//   'CH_00_900': 903.08, 'CH_01_900': 905.24, 'CH_02_900': 907.40,
-//   'CH_03_900': 909.56, 'CH_04_900': 911.72, 'CH_05_900': 913.88,
-//   'CH_06_900': 916.04, 'CH_07_900': 918.20, 'CH_08_900': 920.36,
-//   'CH_09_900': 922.52, 'CH_10_900': 924.68, 'CH_11_900': 926.84, 'CH_12_900': 915,
-//
-//   'CH_10_868': 865.20, 'CH_11_868': 865.50, 'CH_12_868': 865.80,
-//   'CH_13_868': 866.10, 'CH_14_868': 866.40, 'CH_15_868': 866.70,
-//   'CH_16_868': 867   , 'CH_17_868': 868   ,
-
-// See FREQUENCY below to set the channel.
+//!  Using  sck, miso, mosi, cs, reset and D00, D01. Not yet using  D02, D03
+//!  For pin connections see the setup() sections in src/lora_spi.rs and src/gps_usart.rs.
+//! Tested using an RFM95 style radio.
 
 #![no_std]
 #![no_main]

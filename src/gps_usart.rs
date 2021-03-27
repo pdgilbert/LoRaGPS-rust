@@ -8,15 +8,10 @@ use core::convert::Infallible;
 
 use embedded_hal::blocking::delay::DelayMs;
 
-//use embedded_hal_compat::eh1_0::blocking::delay::DelayMs as _;
 use embedded_hal_compat::IntoCompat;
 
 // MODE needs the old version as it is passed to the device hal crates
-//use embedded_hal::{spi::{Mode, Phase, Polarity}, };
 use old_e_h::spi::{Mode, Phase, Polarity};
-
-//  gps usart  wants the old trait ?
-//use old_e_h::serial::Read;
 
 use radio_sx127x::Error as sx127xError; // Error name conflict with hals
 use radio_sx127x::{
