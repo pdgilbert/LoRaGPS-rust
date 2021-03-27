@@ -17,22 +17,24 @@
 #![no_std]
 #![no_main]
 
-#[cfg(debug)]
+#[cfg(debug_assertions)]
 use panic_semihosting;
 
-#[cfg(not(debug))]
+#[cfg(not(debug_assertions))]
 use panic_halt;
+//use panic_reset;
 
 use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
 use embedded_hal::blocking::delay::DelayMs;
+
 use radio::Transmit;
 
-use lora_gps::setup;
+use lora_gps::lora_spi;
 
 #[entry]
 fn main() -> ! {
-    let mut lora = setup(); //delay is available in lora
+    let mut lora = lora_spi::setup(); //delay is available in lora
 
     // print out configuration (for debugging)
 
