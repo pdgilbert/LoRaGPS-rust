@@ -23,7 +23,7 @@ use radio::Receive;
 
 use radio_sx127x::device::PacketInfo;
 
-use lora_gps::lora_spi_rcv;
+use lora_gps::lora_spi;
 
 fn to_str(x: &[u8]) -> &str {
     match core::str::from_utf8(x) {
@@ -34,7 +34,7 @@ fn to_str(x: &[u8]) -> &str {
 
 #[entry]
 fn main() -> ! {
-    let mut lora = lora_spi_rcv::setup(); //delay is available in lora.delay_ms()
+    let mut lora = lora_spi::setup(); //delay is available in lora.delay_ms()
 
     lora.start_receive().unwrap(); // should handle error
 

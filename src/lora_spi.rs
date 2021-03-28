@@ -28,8 +28,8 @@ use radio_sx127x::{
     prelude::*, // prelude has Sx127x,
 };
 
-//use radio::{Receive, Transmit};
-use radio::Transmit; // trait needs to be in scope to find  methods start_transmit and check_transmit.
+// trait needs to be in scope to find  methods start_transmit and check_transmit.
+use radio::{Receive, Transmit};
 
 // lora and radio parameters
 
@@ -91,7 +91,9 @@ use stm32f0xx_hal::{
 };
 
 #[cfg(feature = "stm32f0xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
 
     let cp = CorePeripherals::take().unwrap();
@@ -144,7 +146,9 @@ use stm32f1xx_hal::{
 };
 
 #[cfg(feature = "stm32f1xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -200,7 +204,9 @@ use stm32f3xx_hal::{
 };
 
 #[cfg(feature = "stm32f3xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -280,7 +286,9 @@ use stm32f4xx_hal::{
 //    pub fn setup() ->  LoraType {
 
 #[cfg(feature = "stm32f4xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -339,7 +347,9 @@ use stm32f7xx_hal::{
 };
 
 #[cfg(feature = "stm32f7xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -387,7 +397,9 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Never, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, Never, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Never, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
@@ -439,7 +451,9 @@ use stm32l0xx_hal::{
 };
 
 #[cfg(feature = "stm32l0xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, void::Void, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
@@ -485,7 +499,9 @@ use stm32l1xx_hal::{
 };
 
 #[cfg(feature = "stm32l1xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
@@ -532,7 +548,9 @@ use stm32l4xx_hal::{
 };
 
 #[cfg(feature = "stm32l4xx")]
-pub fn setup() -> impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>> {
+pub fn setup() -> impl DelayMs<u32>
+       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
