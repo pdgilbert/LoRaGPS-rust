@@ -4,95 +4,21 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
-use core::convert::Infallible;
-
-use embedded_hal::blocking::delay::DelayMs;
-
-use embedded_hal_compat::IntoCompat;
-
-// MODE needs the old version as it is passed to the device hal crates
-use old_e_h::spi::{Mode, Phase, Polarity};
-
-use radio_sx127x::Error as sx127xError; // Error name conflict with hals
-use radio_sx127x::{
-    device::lora::{
-        Bandwidth, CodingRate, FrequencyHopping, LoRaChannel, LoRaConfig, PayloadCrc,
-        PayloadLength, SpreadingFactor,
-    },
-    device::{Channel, Modem, PaConfig, PaSelect},
-    prelude::*, // prelude has Sx127x,
-};
-
-//use radio::{Receive, Transmit};
-use radio::Transmit; // trait needs to be in scope to find  methods start_transmit and check_transmit.
-
-// lora and radio parameters
-
-pub const MODE: Mode = Mode {
-    //  SPI mode for radio
-    phase: Phase::CaptureOnSecondTransition,
-    polarity: Polarity::IdleHigh,
-};
-
-const FREQUENCY: u32 = 907_400_000; // frequency in hertz ch_12_900: 915_000_000, ch_2_900: 907_400_000
-
-const CONFIG_CH: LoRaChannel = LoRaChannel {
-    freq: FREQUENCY as u32, // frequency in hertz
-    bw: Bandwidth::Bw125kHz,
-    sf: SpreadingFactor::Sf7,
-    cr: CodingRate::Cr4_8,
-};
-
-const CONFIG_LORA: LoRaConfig = LoRaConfig {
-    preamble_len: 0x8,
-    symbol_timeout: 0x64,
-    payload_len: PayloadLength::Variable,
-    payload_crc: PayloadCrc::Enabled,
-    frequency_hop: FrequencyHopping::Disabled,
-    invert_iq: false,
-};
-
-//   compare other settings in python version
-//    lora.set_mode(sx127x_lora::RadioMode::Stdby).unwrap();
-//    set_tx_power(level, output_pin) level >17 => PA_BOOST.
-//    lora.set_tx_power(17,1).unwrap();
-//    lora.set_tx_power(15,1).unwrap();
-
-//baud = 1000000 is this needed for spi or just USART ?
-
-const CONFIG_PA: PaConfig = PaConfig {
-    output: PaSelect::Boost,
-    power: 10,
-};
-
-//let CONFIG_RADIO = Config::default() ;
-
-const CONFIG_RADIO: radio_sx127x::device::Config = radio_sx127x::device::Config {
-    modem: Modem::LoRa(CONFIG_LORA),
-    channel: Channel::LoRa(CONFIG_CH),
-    pa_config: CONFIG_PA,
-    xtal_freq: 32000000, // CHECK
-    timeout_ms: 100,
-};
-
 // setup() does all  hal/MCU specific setup and returns generic hal device for use in main code.
 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
-    delay::Delay,
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{Peripherals, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
-    spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32f0xx")]
 pub fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
@@ -122,43 +48,23 @@ pub fn setup() -> (
 
     let (tx, rx) = Serial::usart2(p.USART2, (tx, rx), 9600.bps(), &mut rcc).split();
 
-    let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), MODE, 8.mhz(), &mut rcc);
-
-    let delay = Delay::new(cp.SYST, &rcc);
-
-    // Create lora radio instance
-
-    let lora = Sx127x::spi(
-        spi.compat(),
-        pa1.compat(),
-        pb8.compat(),
-        pb9.compat(),
-        pa0.compat(),
-        delay.compat(),
-        &CONFIG_RADIO,
-    )
-    .unwrap(); // should handle error
-
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
-    delay::Delay,
     device::USART2,
-    pac::{CorePeripherals, Peripherals},
+    pac::{Peripherals},
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
-    spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32f1xx")]
 pub fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -185,54 +91,22 @@ pub fn setup() -> (
     )
     .split();
 
-    let spi = Spi::spi1(
-        p.SPI1,
-        (
-            gpioa.pa5.into_alternate_push_pull(&mut gpioa.crl), //   sck   on PA5
-            gpioa.pa6.into_floating_input(&mut gpioa.crl),      //   miso  on PA6
-            gpioa.pa7.into_alternate_push_pull(&mut gpioa.crl), //   mosi  on PA7
-        ),
-        &mut afio.mapr,
-        MODE,
-        8.mhz(),
-        clocks,
-        &mut rcc.apb2,
-    );
-
-    let delay = Delay::new(cp.SYST, clocks);
-
-    // Create lora radio instance
-
-    let lora = Sx127x::spi(
-        spi.compat(),                                             //Spi
-        gpioa.pa1.into_push_pull_output(&mut gpioa.crl).compat(), //CsPin         on PA1
-        gpiob.pb8.into_floating_input(&mut gpiob.crh).compat(),   //BusyPin  DIO0 on PB8
-        gpiob.pb9.into_floating_input(&mut gpiob.crh).compat(),   //ReadyPin DIO1 on PB9
-        gpioa.pa0.into_push_pull_output(&mut gpioa.crl).compat(), //ResetPin      on PA0
-        delay.compat(),                                           //Delay
-        &CONFIG_RADIO,                                            //&Config
-    )
-    .unwrap(); // should handle error
-
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
-    delay::Delay,
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{Peripherals, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
-    spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32f3xx")]
 pub fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -257,74 +131,29 @@ pub fn setup() -> (
     )
     .split();
 
-    let spi = Spi::spi1(
-        p.SPI1,
-        (
-            gpioa.pa5.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // sck   on PA5
-            gpioa.pa6.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // miso  on PA6
-            gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
-        ),
-        MODE,
-        8_000_000.Hz(),
-        clocks,
-        &mut rcc.apb2,
-    );
-
-    let delay = Delay::new(cp.SYST, clocks);
-
-    // Create lora radio instance
-
-    let lora = Sx127x::spi(
-        spi.compat(), //Spi
-        gpioa
-            .pa1
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            .compat(), //CsPin            on PA1
-        gpiob
-            .pb8
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            .compat(), //BusyPin  DIO0 on PB8
-        gpiob
-            .pb9
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            .compat(), //ReadyPin DIO1 on PB9
-        gpioa
-            .pa0
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            .compat(), //ResetPin      on PA0
-        delay.compat(), //Delay
-        &CONFIG_RADIO, //&Config
-    )
-    .unwrap(); // should handle error
-
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 #[cfg(feature = "stm32f4xx")]
 // eg Nucleo-64 stm32f411, blackpill stm32f411, blackpill stm32f401
 use stm32f4xx_hal::{
-    delay::Delay,
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{Peripherals, USART2},
     prelude::*,
     serial::{config::Config, Rx, Serial, Tx},
-    spi::{Error, Spi},
-    time::MegaHertz,
 };
 
 #[cfg(feature = "stm32f4xx")]
 pub fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let p = Peripherals::take().unwrap();
 
     let rcc = p.RCC.constrain();
     let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
 
     let gpioa = p.GPIOA.split();
-    let gpiob = p.GPIOB.split();
 
     let (tx, rx) = Serial::usart2(
         p.USART2,
@@ -338,62 +167,22 @@ pub fn setup() -> (
     .unwrap()
     .split();
 
-    let spi = Spi::spi1(
-        p.SPI1,
-        (
-            gpioa.pa5.into_alternate_af5(), // sck   on PA5
-            gpioa.pa6.into_alternate_af5(), // miso  on PA6
-            gpioa.pa7.into_alternate_af5(), // mosi  on PA7
-        ),
-        MODE,
-        MegaHertz(8).into(),
-        clocks,
-    );
-
-    let delay = Delay::new(cp.SYST, clocks);
-
-    // Create lora radio instance
-
-    // open_drain_output is really input and output. BusyPin is just input, but I think this should work
-    //            gpiob.pb8.into_alternate_open_drain(&mut gpiob.crh),
-    // however, gives trait bound  ... InputPin` is not satisfied
-
-    let lora = Sx127x::spi(
-        spi.compat(),                               //Spi
-        gpioa.pa1.into_push_pull_output().compat(), //CsPin         on PA1
-        gpiob.pb8.into_floating_input().compat(),   //BusyPin  DIO0 on PB8
-        gpiob.pb9.into_floating_input().compat(),   //ReadyPin DIO1 on PB9
-        gpioa.pa0.into_push_pull_output().compat(), //ResetPin      on PA0
-        delay.compat(),                             //Delay
-        &CONFIG_RADIO,                              //&Config
-    )
-    .unwrap(); // should handle error
-
-    //DIO0  triggers RxDone/TxDone status.
-    //DIO1  triggers RxTimeout and other errors status.
-    //D02, D03 ?
-
-    //lora.lora_configure( config_lora, &config_ch ).unwrap(); # not yet pub, to change something
-
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
-    delay::Delay,
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{Peripherals, USART2},
     prelude::*,
     serial::{Config, Oversampling, Rx, Serial, Tx},
-    spi::{ClockDivider, Error, Spi},
 };
 
 #[cfg(feature = "stm32f7xx")]
 pub fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -406,63 +195,22 @@ pub fn setup() -> (
 
     //   somewhere 8.mhz needs to be set in spi
 
-    let spi =
-        Spi::new(p.SPI1, (sck, miso, mosi)).enable::<u8>(&mut rcc.apb2, ClockDivider::DIV32, MODE);
-
-    // Relative to other hal setups, Serial::new is after spi::new because  clocks partially consumes rcc.
-
-    let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
-    //let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
-
-    let (tx, rx) = Serial::new(
-        p.USART2,
-        (
-            gpioa.pa2.into_alternate_af7(), //tx pa2  for GPS
-            gpioa.pa3.into_alternate_af7(),
-        ), //rx pa3  for GPS
-        clocks,
-        Config {
-            baud_rate: 9600.bps(),
-            oversampling: Oversampling::By16,
-            character_match: None,
-        },
-    )
-    .split();
-
-    let delay = Delay::new(cp.SYST, clocks);
-
-    // Create lora radio instance
-
-    let lora = Sx127x::spi(
-        spi.compat(),                               //Spi
-        gpioa.pa1.into_push_pull_output().compat(), //CsPin         on PA1
-        gpiob.pb8.into_floating_input().compat(),   //BusyPin  DIO0 on PB8
-        gpiob.pb9.into_floating_input().compat(),   //ReadyPin DIO1 on PB9
-        gpioa.pa0.into_push_pull_output().compat(), //ResetPin      on PA0
-        delay.compat(),                             //Delay
-        &CONFIG_RADIO,                              //&Config
-    )
-    .unwrap(); // should handle error
-
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{
-    delay::Delay,
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{Peripherals, USART2},
     prelude::*,
     serial::{Rx, Tx},
-    spi::Error,
 };
 
 #[cfg(feature = "stm32h7xx")]
 pub fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, stm32h7xx_hal::Never, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
@@ -515,26 +263,23 @@ pub fn setup() -> (
     )
     .unwrap(); // should handle error
 
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
-    delay::Delay,
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{Peripherals, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, Serial2Ext, Tx},
-    spi::Error,
 };
 
 #[cfg(feature = "stm32l0xx")]
 pub fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, void::Void, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpioa = p.GPIOA.split(&mut rcc);
@@ -551,34 +296,7 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
-    // following  github.com/stm32-rs/stm32l0xx-hal/blob/master/examples/spi.rs
-    let spi = p.SPI1.spi(
-        (
-            gpioa.pa5, // sck   on PA5
-            gpioa.pa6, // miso  on PA6
-            gpioa.pa7, // mosi  on PA7
-        ),
-        MODE,
-        8.mhz(),
-        &mut rcc,
-    );
-
-    let delay = cp.SYST.delay(rcc.clocks);
-
-    // Create lora radio instance
-
-    let lora = Sx127x::spi(
-        spi.compat(),                               //Spi
-        gpioa.pa1.into_push_pull_output().compat(), //CsPin         on PA1
-        gpiob.pb8.into_floating_input().compat(),   //BusyPin  DIO0 on PB8
-        gpiob.pb9.into_floating_input().compat(),   //ReadyPin DIO1 on PB9
-        gpioa.pa0.into_push_pull_output().compat(), //ResetPin      on PA0
-        delay.compat(),                             //Delay
-        &CONFIG_RADIO,                              //&Config
-    )
-    .unwrap(); // should handle error
-
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
@@ -586,18 +304,15 @@ use stm32l1xx_hal::{
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, SerialExt, Tx},
-    spi::Error,
-    //delay::Delay,
-    stm32::{CorePeripherals, Peripherals, USART1},
+    stm32::{Peripherals, USART1},
 };
 
 #[cfg(feature = "stm32l1xx")]
 pub fn setup() -> (
     Tx<USART1>,
     Rx<USART1>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
 
@@ -617,51 +332,22 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
-    let spi = p.SPI1.spi(
-        (
-            gpioa.pa5, // sck   on PA5   in board on Heltec
-            gpioa.pa6, // miso  on PA6   in board on Heltec
-            gpioa.pa7, // mosi  on PA7   in board on Heltec
-        ),
-        MODE,
-        8.mhz(),
-        &mut rcc,
-    );
-
-    let delay = cp.SYST.delay(rcc.clocks);
-
-    // Create lora radio instance
-
-    let lora = Sx127x::spi(
-        spi.compat(),                               //Spi
-        gpioa.pa4.into_push_pull_output().compat(), //CsPin         on PA4  in board on Heltec
-        gpiob.pb11.into_floating_input().compat(),  //BusyPin  DIO0 on PB11 in board on Heltec
-        gpiob.pb10.into_floating_input().compat(),  //ReadyPin DIO1 on PB10 in board on Heltec
-        gpioa.pa3.into_push_pull_output().compat(), //ResetPin      on PA3  in board on Heltec
-        delay.compat(),                             //Delay
-        &CONFIG_RADIO,                              //&Config
-    )
-    .unwrap(); // should handle error
-
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
-    delay::Delay,
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{Peripherals, USART2},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
-    spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32l4xx")]
 pub fn setup() -> (
     Tx<USART2>,
     Rx<USART2>,
-    impl DelayMs<u32> + Transmit<Error = sx127xError<Error, Infallible, Infallible>>,
 ) {
-    let cp = CorePeripherals::take().unwrap();
+    
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
@@ -688,47 +374,7 @@ pub fn setup() -> (
     )
     .split();
 
-    let spi = Spi::spi1(
-        p.SPI1,
-        (
-            gpioa.pa5.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // sck   on PA5
-            gpioa.pa6.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // miso  on PA6
-            gpioa.pa7.into_af5(&mut gpioa.moder, &mut gpioa.afrl), // mosi  on PA7
-        ),
-        MODE,
-        8.mhz(),
-        clocks,
-        &mut rcc.apb2,
-    );
-
-    let delay = Delay::new(cp.SYST, clocks);
-
-    // Create lora radio instance
-
-    let lora = Sx127x::spi(
-        spi.compat(), //Spi
-        gpioa
-            .pa1
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            .compat(), //CsPin             on PA1
-        gpiob
-            .pb8
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            .compat(), //BusyPin  DIO0 on PB8
-        gpiob
-            .pb9
-            .into_floating_input(&mut gpiob.moder, &mut gpiob.pupdr)
-            .compat(), //ReadyPin DIO1 on PB9
-        gpioa
-            .pa0
-            .into_push_pull_output(&mut gpioa.moder, &mut gpioa.otyper)
-            .compat(), //ResetPin      on PA0
-        delay.compat(), //Delay
-        &CONFIG_RADIO, //&Config
-    )
-    .unwrap(); // should handle error
-
-    (tx, rx, lora)
+    (tx, rx)
 }
 
 // End of hal/MCU specific setup. Following should be generic code.
