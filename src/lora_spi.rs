@@ -453,7 +453,7 @@ use stm32l0xx_hal::{
 #[cfg(feature = "stm32l0xx")]
 pub fn setup() -> impl DelayMs<u32>
        + Transmit<Error = sx127xError<Error, void::Void, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>> {
+       + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>> {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());

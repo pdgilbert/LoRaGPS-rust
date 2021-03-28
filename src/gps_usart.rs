@@ -57,7 +57,6 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
 
     let mut afio = p.AFIO.constrain(&mut rcc.apb2);
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
 
     let (tx, rx) = Serial::usart2(
         p.USART2,
@@ -94,7 +93,6 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         .freeze(&mut p.FLASH.constrain().acr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
-    let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
 
     let (tx, rx) = Serial::usart2(
         p.USART2,
@@ -226,7 +224,6 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpioa = p.GPIOA.split(&mut rcc);
-    let gpiob = p.GPIOB.split(&mut rcc);
 
     let (tx, rx) = p
         .USART2
@@ -256,7 +253,6 @@ pub fn setup() -> (Tx<USART1>, Rx<USART1>) {
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
 
     let gpioa = p.GPIOA.split();
-    let gpiob = p.GPIOB.split();
 
     let (tx, rx) = p
         .USART1
@@ -295,7 +291,6 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         .freeze(&mut flash.acr, &mut pwr);
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
-    let mut gpiob = p.GPIOB.split(&mut rcc.ahb2);
 
     let (tx, rx) = Serial::usart2(
         p.USART2,
