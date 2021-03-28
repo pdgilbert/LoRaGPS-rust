@@ -14,37 +14,22 @@ use stm32f0xx_hal::{
 };
 
 #[cfg(feature = "stm32f0xx")]
-pub fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-) {
-    
+pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let mut p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.configure().freeze(&mut p.FLASH);
 
     let gpioa = p.GPIOA.split(&mut rcc);
-    let gpiob = p.GPIOB.split(&mut rcc);
 
     //  stm32f030xc builds with gpiob..into_alternate_af4(cs) USART3 on tx pb10, rx pb11
     //    but stm32f042  only has 2 usarts.
     //  Both have gpioa..into_alternate_af1(cs) USART2 with tx on pa2 and rx pa3
 
-    let (tx, rx, sck, miso, mosi, _rst, pa1, pb8, pb9, pa0) =
-        cortex_m::interrupt::free(move |cs| {
-            (
-                gpioa.pa2.into_alternate_af1(cs), //tx pa2  for GPS
-                gpioa.pa3.into_alternate_af1(cs), //rx pa3  for GPS
-                gpioa.pa5.into_alternate_af0(cs), //   sck   on PA5
-                gpioa.pa6.into_alternate_af0(cs), //   miso  on PA6
-                gpioa.pa7.into_alternate_af0(cs), //   mosi  on PA7
-                //gpioa.pa1.into_push_pull_output(cs),          //   cs            on PA1
-                gpiob.pb1.into_push_pull_output(cs), //   reset         on PB1
-                gpioa.pa1.into_push_pull_output(cs), //   CsPin             on PA1
-                gpiob.pb8.into_floating_input(cs),   //   BusyPin  DIO0 on PB8
-                gpiob.pb9.into_floating_input(cs),   //   ReadyPin DIO1 on PB9
-                gpioa.pa0.into_push_pull_output(cs), //   ResetPin              on PA0
-            )
-        });
+    let (tx, rx) = cortex_m::interrupt::free(move |cs| {
+        (
+            gpioa.pa2.into_alternate_af1(cs), //tx pa2  for GPS
+            gpioa.pa3.into_alternate_af1(cs), //rx pa3  for GPS
+        )
+    });
 
     let (tx, rx) = Serial::usart2(p.USART2, (tx, rx), 9600.bps(), &mut rcc).split();
 
@@ -54,17 +39,13 @@ pub fn setup() -> (
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     device::USART2,
-    pac::{Peripherals},
+    pac::Peripherals,
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
 };
 
 #[cfg(feature = "stm32f1xx")]
-pub fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-) {
-    
+pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -102,11 +83,7 @@ use stm32f3xx_hal::{
 };
 
 #[cfg(feature = "stm32f3xx")]
-pub fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-) {
-    
+pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
 
     let mut rcc = p.RCC.constrain();
@@ -143,11 +120,7 @@ use stm32f4xx_hal::{
 };
 
 #[cfg(feature = "stm32f4xx")]
-pub fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-) {
-    
+pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
 
     let rcc = p.RCC.constrain();
@@ -178,22 +151,29 @@ use stm32f7xx_hal::{
 };
 
 #[cfg(feature = "stm32f7xx")]
-pub fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-) {
-    
+pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
-
-    let mut rcc = p.RCC.constrain();
+    let rcc = p.RCC.constrain();
     let gpioa = p.GPIOA.split();
-    let gpiob = p.GPIOB.split();
 
-    let sck = gpioa.pa5.into_alternate_af5(); // sck   on PA5
-    let miso = gpioa.pa6.into_alternate_af5(); // miso  on PA6
-    let mosi = gpioa.pa7.into_alternate_af5(); // mosi  on PA7
+    // Relative to other hal setups, Serial::new is after spi::new because  clocks partially consumes rcc.
+    let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
+    //let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
 
-    //   somewhere 8.mhz needs to be set in spi
+    let (tx, rx) = Serial::new(
+        p.USART2,
+        (
+            gpioa.pa2.into_alternate_af7(), //tx pa2  for GPS
+            gpioa.pa3.into_alternate_af7(),
+        ), //rx pa3  for GPS
+        clocks,
+        Config {
+            baud_rate: 9600.bps(),
+            oversampling: Oversampling::By16,
+            character_match: None,
+        },
+    )
+    .split();
 
     (tx, rx)
 }
@@ -206,11 +186,7 @@ use stm32h7xx_hal::{
 };
 
 #[cfg(feature = "stm32h7xx")]
-pub fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-) {
-    
+pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
     let vos = pwr.freeze();
@@ -219,7 +195,6 @@ pub fn setup() -> (
     let clocks = ccdr.clocks;
 
     let gpioa = p.GPIOA.split(ccdr.peripheral.GPIOA);
-    let gpiob = p.GPIOB.split(ccdr.peripheral.GPIOB);
 
     let (tx, rx) = p
         .USART2
@@ -235,34 +210,6 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
-    // following github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/spi.rs
-    let spi = p.SPI1.spi(
-        (
-            gpioa.pa5.into_alternate_af5(), // sck   on PA5
-            gpioa.pa6.into_alternate_af5(), // miso  on PA6
-            gpioa.pa7.into_alternate_af5(), // mosi  on PA7
-        ),
-        MODE,
-        8.mhz(),
-        ccdr.peripheral.SPI1,
-        &clocks,
-    );
-
-    let delay = Delay::new(cp.SYST, clocks);
-
-    // Create lora radio instance
-
-    let lora = Sx127x::spi(
-        spi.compat(),                               //Spi
-        gpioa.pa1.into_push_pull_output().compat(), //CsPin         on PA1
-        gpiob.pb8.into_floating_input().compat(),   //BusyPin  DIO0 on PB8
-        gpiob.pb9.into_floating_input().compat(),   //ReadyPin DIO1 on PB9
-        gpioa.pa0.into_push_pull_output().compat(), //ResetPin      on PA0
-        delay.compat(),                             //Delay
-        &CONFIG_RADIO,                              //&Config
-    )
-    .unwrap(); // should handle error
-
     (tx, rx)
 }
 
@@ -275,11 +222,7 @@ use stm32l0xx_hal::{
 };
 
 #[cfg(feature = "stm32l0xx")]
-pub fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-) {
-    
+pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
     let gpioa = p.GPIOA.split(&mut rcc);
@@ -308,11 +251,7 @@ use stm32l1xx_hal::{
 };
 
 #[cfg(feature = "stm32l1xx")]
-pub fn setup() -> (
-    Tx<USART1>,
-    Rx<USART1>,
-) {
-    
+pub fn setup() -> (Tx<USART1>, Rx<USART1>) {
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
 
@@ -343,11 +282,7 @@ use stm32l4xx_hal::{
 };
 
 #[cfg(feature = "stm32l4xx")]
-pub fn setup() -> (
-    Tx<USART2>,
-    Rx<USART2>,
-) {
-    
+pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
     let mut rcc = p.RCC.constrain();
