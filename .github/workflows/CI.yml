@@ -34,7 +34,7 @@ jobs:
         mcu: [stm32f030xc, stm32f100, stm32f101, stm32f103, stm32f303xc, stm32f401, stm32f411, stm32f722,
               stm32h742, stm32l0x2, stm32l100, stm32l151, stm32l4x2, ]
         
-        #bin:  [ lora_spi_send, lora_spi_receive, lora_spi_gps ]
+        #bin:  [ send_spi, receive_spi, send_gps ]
         # bins are all built because they are in the Cargo.toml.
         
         include:

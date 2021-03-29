@@ -13,16 +13,16 @@ readme = "README.md"
 test = true
 
 [[bin]]
-name = "lora_spi_send"
-path = "src/bin/lora_spi_send.rs"
+name = "send_spi"
+path = "src/bin/send_spi.rs"
 
 [[bin]]
-name = "lora_spi_receive"
-path = "src/bin/lora_spi_receive.rs"
+name = "receive_spi"
+path = "receive_spi.rs"
 
 [[bin]]
-name = "lora_spi_gps"
-path = "src/bin/lora_spi_gps.rs"
+name = "send_gps"
+path = "src/bin/send_gps.rs"
 #test = false
 #bench = false
 

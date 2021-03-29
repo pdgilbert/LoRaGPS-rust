@@ -28,9 +28,9 @@ See [repo eg_stm_hal](https://github.com/pdgilbert/eg_stm_hal) for examples of o
 
 ```
 cargo build  --target $TARGET  --features $HAL,$MCU
-cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_receive
-SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_send
-SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_gps
+cargo build  --target $TARGET  --features $HAL,$MCU   --bin receive_spi
+SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin send_spi
+SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin send_gps
 
 cargo test  --target $TARGET  --features $HAL,$MCU
 
@@ -86,9 +86,9 @@ openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg
 Build and load in a separate window with one of
 
 ```
-cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_receive
-SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_send
-SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_gps
+cargo  run --target $TARGET --features $HAL,$MCU  --bin  receive_spi
+SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  send_spi
+SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  send_gps
 
 ```
 
