@@ -62,8 +62,8 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         p.USART2,
         (
             gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl), //tx pa2  for GPS rx
-            gpioa.pa3,
-        ), //rx pa3  for GPS tx
+            gpioa.pa3, //rx pa3  for GPS tx
+        ),
         &mut afio.mapr,
         Config::default().baudrate(9_600.bps()),
         clocks,
@@ -98,8 +98,8 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         p.USART2,
         (
             gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2  for GPS rx
-            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
-        ), //rx pa3  for GPS tx
+            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //rx pa3  for GPS tx
+        ),
         9600.Bd(), // 115_200.bps(),
         clocks,
         &mut rcc.apb1,
@@ -130,8 +130,8 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         p.USART2,
         (
             gpioa.pa2.into_alternate_af7(), //tx pa2  for GPS rx
-            gpioa.pa3.into_alternate_af7(),
-        ), //rx pa3  for GPS tx
+            gpioa.pa3.into_alternate_af7(), //rx pa3  for GPS tx
+        ),
         Config::default().baudrate(9600.bps()),
         clocks,
     )
@@ -162,8 +162,8 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         p.USART2,
         (
             gpioa.pa2.into_alternate_af7(), //tx pa2  for GPS
-            gpioa.pa3.into_alternate_af7(),
-        ), //rx pa3  for GPS
+            gpioa.pa3.into_alternate_af7(), //rx pa3  for GPS
+        ),
         clocks,
         Config {
             baud_rate: 9600.bps(),
@@ -199,8 +199,8 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         .serial(
             (
                 gpioa.pa2.into_alternate_af7(), //tx pa2 for GPS rx
-                gpioa.pa3.into_alternate_af7(),
-            ), //rx pa3 for GPS tx
+                gpioa.pa3.into_alternate_af7(), //rx pa3 for GPS tx
+            ),
             9600.bps(),
             ccdr.peripheral.USART2,
             &clocks,
@@ -259,8 +259,8 @@ pub fn setup() -> (Tx<USART1>, Rx<USART1>) {
         .usart(
             (
                 gpioa.pa9, //tx pa9   for GPS rx
-                gpioa.pa10,
-            ), //rx pa10  for GPS tx
+                gpioa.pa10, //rx pa10  for GPS tx
+            ),
             Config::default().baudrate(9600.bps()),
             &mut rcc,
         )
@@ -296,8 +296,8 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         p.USART2,
         (
             gpioa.pa2.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //tx pa2  for GPS
-            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl),
-        ), //rx pa3  for GPS
+            gpioa.pa3.into_af7(&mut gpioa.moder, &mut gpioa.afrl), //rx pa3  for GPS
+        ),
         Config::default().baudrate(9600.bps()),
         clocks,
         &mut rcc.apb1r1,
