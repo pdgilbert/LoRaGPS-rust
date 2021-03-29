@@ -27,10 +27,10 @@ See [repo eg_stm_hal](https://github.com/pdgilbert/eg_stm_hal) for examples of o
 ## Building
 
 ```
-cargo build  --target $TARGET  --features $HAL,$MCU
-cargo build  --target $TARGET  --features $HAL,$MCU   --bin receive_spi
-SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin send_spi
-SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin send_gps
+cargo build  --target $TARGET  --features $HAL,$MCU   [ --release ]
+cargo build  --target $TARGET  --features $HAL,$MCU   --bin receive_spi   [ --release ]
+SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin send_spi   [ --release ]
+SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin send_gps   [ --release ]
 
 cargo test  --target $TARGET  --features $HAL,$MCU
 
@@ -41,6 +41,8 @@ This is useful when there are many sending systems.
 Variables `HAL`  and `MCU` overlap. It should be possible to determine  `HAL`  based on `MCU`.
 The variable `HAL` is used in the code whereas some of the underlying HAL packages
 actually need the specific `MCU`.
+
+On systems with limited memory (eg bluepill) it will be necessary to specify `--release` for the binary to fit in flash.
 
 ```
               cargo run  environment variables                        openocd        test board and processor
@@ -86,9 +88,9 @@ openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg
 Build and load in a separate window with one of
 
 ```
-cargo  run --target $TARGET --features $HAL,$MCU  --bin  receive_spi
-SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  send_spi
-SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  send_gps
+cargo  run --target $TARGET --features $HAL,$MCU  --bin  receive_spi   [ --release ]
+SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  send_spi   [ --release ]
+SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  send_gps   [ --release ]
 
 ```
 

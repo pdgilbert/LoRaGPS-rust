@@ -18,7 +18,7 @@ path = "src/bin/send_spi.rs"
 
 [[bin]]
 name = "receive_spi"
-path = "receive_spi.rs"
+path = "src/bin/receive_spi.rs"
 
 [[bin]]
 name = "send_gps"
