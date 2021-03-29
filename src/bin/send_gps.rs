@@ -94,7 +94,7 @@ fn main() -> ! {
                     for v in b"  ".iter() {
                         buf2.push(*v).unwrap();
                     }
-                    
+
                     for v in buffer[19..31].iter() {
                         buf2.push(*v).unwrap();
                     } // [19..31] is north/south.

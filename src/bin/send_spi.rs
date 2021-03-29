@@ -27,7 +27,7 @@ fn main() -> ! {
     // SENDER_ID="whatever" cargo build ...
     // or  cargo:rustc-env=SENDER_ID="whatever"
     let id = option_env!("SENDER_ID").expect("Hello, LoRa!").as_bytes();
-    
+
     let mut lora = lora_spi::setup(); //delay is available in lora
 
     // print out configuration (for debugging)
