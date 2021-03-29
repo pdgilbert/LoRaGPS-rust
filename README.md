@@ -28,14 +28,16 @@ See [repo eg_stm_hal](https://github.com/pdgilbert/eg_stm_hal) for examples of o
 
 ```
 cargo build  --target $TARGET  --features $HAL,$MCU
-cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_send
 cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_receive
-cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_gps
+SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_send
+SENDER_ID="whatever"  cargo build  --target $TARGET  --features $HAL,$MCU   --bin lora_spi_gps
 
 cargo test  --target $TARGET  --features $HAL,$MCU
 
 ```
-where  `TARGET`, `HAL`  and `MCU` are environment variables for your processor. 
+where  `TARGET`, `HAL`  and `MCU` are environment variables for your processor.
+SENDER_ID is optional. If supplied it will prepend sent messages. 
+This is useful when there are many sending systems.
 Variables `HAL`  and `MCU` overlap. It should be possible to determine  `HAL`  based on `MCU`.
 The variable `HAL` is used in the code whereas some of the underlying HAL packages
 actually need the specific `MCU`.
@@ -81,12 +83,12 @@ Using openocd  to load compiled code to the MCU and for semihost or debugging:
 openocd -f interface/$INTERFACE.cfg -f target/$PROC.cfg 
 ```
 
-In a separate window one of
+Build and load in a separate window with one of
 
 ```
-cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_send
 cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_receive
-cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_gps
+SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_send
+SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  lora_spi_gps
 
 ```
 

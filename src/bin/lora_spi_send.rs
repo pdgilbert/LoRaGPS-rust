@@ -23,6 +23,11 @@ use lora_gps::lora_spi;
 
 #[entry]
 fn main() -> ! {
+    // set this with
+    // SENDER_ID="whatever" cargo build ...
+    // or  cargo:rustc-env=SENDER_ID="whatever"
+    let id = option_env!("SENDER_ID").expect("Hello, LoRa!").as_bytes();
+    
     let mut lora = lora_spi::setup(); //delay is available in lora
 
     // print out configuration (for debugging)
@@ -45,7 +50,8 @@ fn main() -> ! {
 
     //let buffer = &[0xaa, 0xbb, 0xcc];
 
-    let message = b"Hello, LoRa!";
+    let message = id;
+    //let message = b"Hello, LoRa!";
 
     //let mut buffer = [0;100];      //Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
     //for (i,c) in message.chars().enumerate() {

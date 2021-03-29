@@ -28,6 +28,11 @@ use lora_gps::lora_spi;
 
 #[entry]
 fn main() -> ! {
+    // set this with
+    // SENDER_ID="whatever" cargo build ...
+    // or  cargo:rustc-env=SENDER_ID="whatever"
+    let id = option_env!("SENDER_ID").expect("").as_bytes();
+
     let (mut _tx_gps, mut rx_gps) = gps_usart::setup(); //  GPS
     let mut lora = lora_spi::setup(); //  lora (delay is available in lora)
 
@@ -64,7 +69,7 @@ fn main() -> ! {
 
         if good {
             if buffer.push(byte).is_err() || byte == 13 {
-                //transmit if end of line. \r is 13, \n is 10
+                //push byte into buffer and transmit if error (buffer full) or end of line. \r is 13, \n is 10
 
                 //hprintln!("{:?}", &buffer).unwrap();
 
@@ -83,6 +88,13 @@ fn main() -> ! {
                 if &buffer[0..6] == [36, 71, 80, 82, 77, 67] {
                     // if message id is $GPRMC
 
+                    for v in id.iter() {
+                        buf2.push(*v).unwrap();
+                    }
+                    for v in b"  ".iter() {
+                        buf2.push(*v).unwrap();
+                    }
+                    
                     for v in buffer[19..31].iter() {
                         buf2.push(*v).unwrap();
                     } // [19..31] is north/south.
