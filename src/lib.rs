@@ -6,7 +6,6 @@ use panic_semihosting as _;
 #[cfg(not(debug_assertions))]
 use panic_halt as _;
 
-pub mod gps_usart;
 pub mod lora_spi;
 
 // consider putting some real tests here

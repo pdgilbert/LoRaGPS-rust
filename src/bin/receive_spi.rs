@@ -34,7 +34,7 @@ fn to_str(x: &[u8]) -> &str {
 
 #[entry]
 fn main() -> ! {
-    let mut lora = lora_spi::setup(); //delay is available in lora.delay_ms()
+    let (mut lora, _rx, _tx) = lora_spi::setup(); //delay is available in lora.delay_ms()
 
     lora.start_receive().unwrap(); // should handle error
 
