@@ -62,7 +62,7 @@ pub fn setup() -> (Tx<USART2>, Rx<USART2>) {
         p.USART2,
         (
             gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl), //tx pa2  for GPS rx
-            gpioa.pa3, //rx pa3  for GPS tx
+            gpioa.pa3,                                          //rx pa3  for GPS tx
         ),
         &mut afio.mapr,
         Config::default().baudrate(9_600.bps()),
@@ -258,7 +258,7 @@ pub fn setup() -> (Tx<USART1>, Rx<USART1>) {
         .USART1
         .usart(
             (
-                gpioa.pa9, //tx pa9   for GPS rx
+                gpioa.pa9,  //tx pa9   for GPS rx
                 gpioa.pa10, //rx pa10  for GPS tx
             ),
             Config::default().baudrate(9600.bps()),
