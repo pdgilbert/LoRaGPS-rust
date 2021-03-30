@@ -1,6 +1,6 @@
 //! Transmit a simple message with LoRa using crate radio_sx127x (on SPI).
 //!  Using  sck, miso, mosi, cs, reset and D00, D01. Not yet using  D02, D03
-//!  For pin connections see the setup() sections in src/lora_spi.rs.
+//!  For pin connections see the setup() sections in src/lora_spi_gps_usart.rs.
 //! Tested using an RFM95 style radio.
 
 #![no_std]
@@ -19,7 +19,7 @@ use embedded_hal::blocking::delay::DelayMs;
 
 use radio::Transmit;
 
-use lora_gps::lora_spi;
+use lora_gps::lora_spi_gps_usart::setup;
 
 #[entry]
 fn main() -> ! {
@@ -28,7 +28,7 @@ fn main() -> ! {
     // or  cargo:rustc-env=SENDER_ID="whatever"
     let id = option_env!("SENDER_ID").expect("Hello, LoRa!").as_bytes();
 
-    let (mut lora, _rx, _tx) = lora_spi::setup(); //delay is available in lora
+    let (mut lora, _rx, _tx) = setup(); //delay is available in lora
 
     // print out configuration (for debugging)
 

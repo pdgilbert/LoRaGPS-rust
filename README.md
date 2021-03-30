@@ -17,11 +17,11 @@ See [repo eg_stm_hal](https://github.com/pdgilbert/eg_stm_hal) for examples of o
 
 ## Summary
 
-| xxx              |   Description                                              |
-| ---------------- |:---------------------------------------------------------- |
-| lora_spi_send    | transmit a character string over LoRa,  + semihost output  |
-| lora_spi_receive | receive  a character string over LoRa,  + semihost output  |
-| lora_spi_gps     | read gps and transmit over LoRa,  + semihost output        |
+| xxx         |   Description                                              |
+| ----------- |:---------------------------------------------------------- |
+| send_spi    | transmit a character string over LoRa,  + semihost output  |
+| receive_spi | receive  a character string over LoRa,  + semihost output  |
+| send_gps    | read gps and transmit over LoRa,  + semihost output        |
 
 
 ## Building

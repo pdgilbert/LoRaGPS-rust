@@ -1,6 +1,6 @@
 //! Receive message with LoRa using crate radio_sx127x (on SPI) and print on semihost.
 //!  Using  sck, miso, mosi, cs, reset and D00, D01. Not yet using  D02, D03
-//!  For pin connections see the setup() sections in src/lora_spi.rs.
+//!  For pin connections see the setup() sections in src/lora_spi_gps_usart.rs.
 //! Tested using an RFM95 style radio.
 
 #![no_std]
@@ -23,7 +23,7 @@ use radio::Receive;
 
 use radio_sx127x::device::PacketInfo;
 
-use lora_gps::lora_spi;
+use lora_gps::lora_spi_gps_usart::setup;
 
 fn to_str(x: &[u8]) -> &str {
     match core::str::from_utf8(x) {
@@ -34,7 +34,7 @@ fn to_str(x: &[u8]) -> &str {
 
 #[entry]
 fn main() -> ! {
-    let (mut lora, _rx, _tx) = lora_spi::setup(); //delay is available in lora.delay_ms()
+    let (mut lora, _rx, _tx) = setup(); //delay is available in lora.delay_ms()
 
     lora.start_receive().unwrap(); // should handle error
 
