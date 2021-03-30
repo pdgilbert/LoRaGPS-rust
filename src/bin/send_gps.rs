@@ -23,7 +23,7 @@ use nb::block;
 //use embedded_hal::serial::Read;
 use old_e_h::serial::Read;
 
-use lora_gps::lora_spi_gps_usart::setup;
+use lora_gps::lora_spi_gps_usart::{setup, LED};
 
 #[entry]
 fn main() -> ! {
@@ -34,7 +34,7 @@ fn main() -> ! {
 
     //hprintln!("id  {:?} length {:?}", id, id.len()).unwrap();
 
-    let (mut lora, _tx_gps, mut rx_gps) = setup(); //  lora (delay is available in lora)
+    let (mut lora, _tx_gps, mut rx_gps, mut led) = setup(); //  lora (delay is available in lora)
 
     // byte buffer   Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
     let mut buffer: Vec<u8, consts::U80> = Vec::new();
@@ -99,6 +99,10 @@ fn main() -> ! {
 
                     //hprintln!("{:?}", &buf2).unwrap();
                     hprint!(".").unwrap(); // print "."  on transmit of $GPRMC message (but not others)
+                    led.on(); // double blink on transmit of decoded message, one here and one below.
+                    let _ = lora.try_delay_ms(20u32);
+                    led.off();
+                    let _ = lora.try_delay_ms(300u32);
                 } else {
                     for v in buffer[..].iter() {
                         buf2.push(*v).unwrap();
@@ -106,10 +110,14 @@ fn main() -> ! {
                 };
 
                 match lora.start_transmit(&buf2) {
-                    Ok(b) => b, // b is ()
-                    Err(_err) => {
+                    Ok(_b) => {
+                        led.on();
+                        let _ = lora.try_delay_ms(20u32);
+                        led.off();
+                     }
+                     Err(_err) => {
                         hprintln!("Error returned from lora.start_transmit().").unwrap();
-                        panic!("should reset in release mode.");
+                        //panic!("should reset in release mode.");
                     }
                 };
 
@@ -130,7 +138,7 @@ fn main() -> ! {
                     }
                     Err(_err) => {
                         hprintln!("Error returned from lora.check_transmit().").unwrap();
-                        panic!("should reset in release mode.");
+                        //panic!("should reset in release mode.");
                     }
                 };
 

@@ -80,6 +80,14 @@ pub const CONFIG_RADIO: radio_sx127x::device::Config = radio_sx127x::device::Con
     timeout_ms: 100,
 };
 
+
+// blink on board led to signal succesful transmit
+pub trait LED {
+    fn on(&mut self) -> ();
+    fn off(&mut self) -> ();
+}
+
+
 // setup() does all  hal/MCU specific setup and returns generic object for use in main code.
 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
@@ -89,6 +97,7 @@ use stm32f0xx_hal::{
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
+    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 #[cfg(feature = "stm32f0xx")]
@@ -98,6 +107,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    PC13<Output<PushPull>>
 ) {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
 
@@ -108,7 +118,7 @@ pub fn setup() -> (
     let gpioa = p.GPIOA.split(&mut rcc);
     let gpiob = p.GPIOB.split(&mut rcc);
 
-    let (sck, miso, mosi, _rst, pa1, pb8, pb9, pa0, tx, rx) =
+    let (sck, miso, mosi, _rst, pa1, pb8, pb9, pa0, tx, rx, led) =
         cortex_m::interrupt::free(move |cs| {
             (
                 gpioa.pa5.into_alternate_af0(cs), //    sck     on PA5
@@ -122,6 +132,7 @@ pub fn setup() -> (
                 gpioa.pa0.into_push_pull_output(cs), //   ResetPin on PA0
                 gpioa.pa2.into_alternate_af1(cs),    //tx pa2  for GPS
                 gpioa.pa3.into_alternate_af1(cs),    //rx pa3  for GPS
+                gpioc.pc13.into_push_pull_output(cs), //led
             )
         });
 
@@ -151,7 +162,9 @@ pub fn setup() -> (
 
     let (tx, rx) = Serial::usart2(p.USART2, (tx, rx), 9600.bps(), &mut rcc).split();
 
-    (lora, tx, rx)
+    // led on pc13 with on/off  above
+
+    (lora, tx, rx, led)
 }
 
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
@@ -162,6 +175,7 @@ use stm32f1xx_hal::{
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
     spi::{Error, Spi},
+    gpio::{gpioc::PC13, Output, OutputPin, PushPull},
 };
 
 #[cfg(feature = "stm32f1xx")]
@@ -171,6 +185,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    PC13<Output<PushPull>>
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -228,7 +243,18 @@ pub fn setup() -> (
     )
     .split();
 
-    (lora, tx, rx)
+    impl LED for dyn OutputPin<Error = Infallible> {
+        fn on(&mut self) -> () {
+            self.try_set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.try_set_high().unwrap()
+        }
+    };
+
+    let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13 with on/off
+
+    (lora, tx, rx, led)
 }
 
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
@@ -238,6 +264,7 @@ use stm32f3xx_hal::{
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
+    gpio::{gpioe::PE15, Output, PushPull},
 };
 
 #[cfg(feature = "stm32f3xx")]
@@ -247,6 +274,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    PE15<Output<PushPull>>
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -313,7 +341,19 @@ pub fn setup() -> (
     )
     .split();
 
-    (lora, tx, rx)
+    impl LED for PE15<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+    };
+
+    //led on pe15 with on/off
+    let led = gpioe.pe15.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
+
+    (lora, tx, rx, led)
 }
 
 #[cfg(feature = "stm32f4xx")]
@@ -325,6 +365,7 @@ use stm32f4xx_hal::{
     serial::{config::Config, Rx, Serial, Tx},
     spi::{Error, Spi},
     time::MegaHertz,
+    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 // If the type for the lora object is needed somewhere other than just in the setup() return type then it
@@ -346,6 +387,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    PC13<Output<PushPull>>
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -355,6 +397,7 @@ pub fn setup() -> (
 
     let gpioa = p.GPIOA.split();
     let gpiob = p.GPIOB.split();
+    let gpioc = p.GPIOC.split();
 
     let spi = Spi::spi1(
         p.SPI1,
@@ -405,7 +448,20 @@ pub fn setup() -> (
     .unwrap()
     .split();
 
-    (lora, tx, rx)
+    // Note that blackpill with stm32f411 and nucleo-64 with stm32f411 have onboard led wired
+    // differently. Next will be reversed for nucleo-64 (in addition to PA5 vs PC13).
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+    };
+
+    let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off (note delay is in lora)
+
+    (lora, tx, rx, led)
 }
 
 #[cfg(feature = "stm32f7xx")]
@@ -415,6 +471,7 @@ use stm32f7xx_hal::{
     prelude::*,
     serial::{Config, Oversampling, Rx, Serial, Tx},
     spi::{ClockDivider, Error, Spi},
+    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 #[cfg(feature = "stm32f7xx")]
@@ -424,6 +481,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    PC13<Output<PushPull>>
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -476,7 +534,18 @@ pub fn setup() -> (
     )
     .split();
 
-    (lora, tx, rx)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+    };
+
+    let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
+
+    (lora, tx, rx, led)
 }
 
 #[cfg(feature = "stm32h7xx")]
@@ -487,6 +556,7 @@ use stm32h7xx_hal::{
     serial::{Rx, Tx},
     spi::Error,
     Never,
+    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 #[cfg(feature = "stm32h7xx")]
@@ -496,6 +566,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Never, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    PC13<Output<PushPull>>
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -550,7 +621,18 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
-    (lora, tx, rx)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+    };
+
+    let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
+
+    (lora, tx, rx, led)
 }
 
 #[cfg(feature = "stm32l0xx")]
@@ -560,6 +642,7 @@ use stm32l0xx_hal::{
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, Serial2Ext, Tx},
     spi::Error,
+    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 #[cfg(feature = "stm32l0xx")]
@@ -569,6 +652,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    PC13<Output<PushPull>>
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -614,7 +698,18 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
-    (lora, tx, rx)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+    };
+
+    let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
+
+    (lora, tx, rx, led)
 }
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
@@ -624,6 +719,7 @@ use stm32l1xx_hal::{
     serial::{Config, Rx, SerialExt, Tx},
     spi::Error,
     stm32::{CorePeripherals, Peripherals, USART1},
+    gpio::{gpiob::PB6, Output, PushPull},
 };
 
 #[cfg(feature = "stm32l1xx")]
@@ -633,6 +729,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART1>,
     Rx<USART1>,
+    PB6<Output<PushPull>>
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -681,7 +778,18 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
-    (lora, tx, rx)
+    impl LED for PB6<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+    };
+
+    let led = gpiob.pb6.into_push_pull_output(); // led on pb6 with on/off
+
+    (lora, tx, rx, led)
 }
 
 #[cfg(feature = "stm32l4xx")]
@@ -691,6 +799,7 @@ use stm32l4xx_hal::{
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
     spi::{Error, Spi},
+    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 #[cfg(feature = "stm32l4xx")]
@@ -700,6 +809,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    PC13<Output<PushPull>>
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -768,7 +878,19 @@ pub fn setup() -> (
     )
     .split();
 
-    (lora, tx, rx)
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+    };
+
+    // led on pc13 with on/off
+    let led = gpioc.pc13.into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper); 
+
+    (lora, tx, rx, led)
 }
 
 // End of hal/MCU specific setup. Following should be generic code.
