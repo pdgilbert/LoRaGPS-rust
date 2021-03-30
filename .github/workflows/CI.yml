@@ -2,9 +2,9 @@ name: LoRaGPS-rust
 
 on:
   push:
-    branches: [ combine_setups ]
+    branches: [ master ]
   pull_request:
-    branches: [ combine_setups ]
+    branches: [ master ]
 
 env:
   CARGO_TERM_COLOR: always
