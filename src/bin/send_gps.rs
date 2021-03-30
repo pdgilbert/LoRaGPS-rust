@@ -23,7 +23,7 @@ use nb::block;
 //use embedded_hal::serial::Read;
 use old_e_h::serial::Read;
 
-use lora_gps::lora_spi;
+use lora_gps::lora_spi_gps_usart::setup;
 
 #[entry]
 fn main() -> ! {
@@ -34,7 +34,7 @@ fn main() -> ! {
 
     //hprintln!("id  {:?} length {:?}", id, id.len()).unwrap(); 
 
-    let (mut lora, _tx_gps, mut rx_gps) = lora_spi::setup(); //  lora (delay is available in lora)
+    let (mut lora, _tx_gps, mut rx_gps) = setup(); //  lora (delay is available in lora)
 
     // byte buffer   Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
     let mut buffer: Vec<u8, consts::U80> = Vec::new();
