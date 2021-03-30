@@ -32,7 +32,7 @@ fn main() -> ! {
     // or  cargo:rustc-env=SENDER_ID="whatever"
     let id = option_env!("SENDER_ID").expect("").as_bytes();
 
-    //hprintln!("id  {:?} length {:?}", id, id.len()).unwrap(); 
+    //hprintln!("id  {:?} length {:?}", id, id.len()).unwrap();
 
     let (mut lora, _tx_gps, mut rx_gps) = setup(); //  lora (delay is available in lora)
 
@@ -68,30 +68,30 @@ fn main() -> ! {
         };
 
         if good {
-            //push byte into buffer and transmit if error/buffer full or end of line. \r is 13, \n is 10            
+            //push byte into buffer and transmit if error/buffer full or end of line. \r is 13, \n is 10
             if buffer.push(byte).is_err() || byte == 13 {
                 //hprintln!("{:?}", &buffer).unwrap();
-                
+
                 buf2.clear();
                 // put id in first
                 for v in id.iter() {
                     buf2.push(*v).unwrap();
                 }
                 buf2.push(b' ').unwrap();
- 
-                // for message $GPRMC == [36, 71, 80, 82, 77, 67] 
+
+                // for message $GPRMC == [36, 71, 80, 82, 77, 67]
                 //    transmit GPS N and E in hundredths of degrees
                 // otherwise transmits the GPS message line
 
                 // if message id is $GPRMC but if buffer is too short then not valid data (V) orsomething was lost, so skip
                 //B411-2 $GPRMC,030052.00,V,,,,,,,300321,,,N*7A
                 //$GPRMC,031737.00,A,4523.74241,N,07540.61255,W,0.551,,300321,,,A*66
-                if ( buffer.len() >45 ) && ( &buffer[0..6] == [36, 71, 80, 82, 77, 67] ) {                    
+                if (buffer.len() > 45) && (&buffer[0..6] == [36, 71, 80, 82, 77, 67]) {
                     // [19..31] is north/south.
                     for v in buffer[19..31].iter() {
                         buf2.push(*v).unwrap();
                     }
-                   buf2.push(b' ').unwrap();
+                    buf2.push(b' ').unwrap();
                     // [32..45] is east/west
                     for v in buffer[32..45].iter() {
                         buf2.push(*v).unwrap();
@@ -100,7 +100,7 @@ fn main() -> ! {
                     //hprintln!("{:?}", &buf2).unwrap();
                     hprint!(".").unwrap(); // print "."  on transmit of $GPRMC message (but not others)
                 } else {
-                     for v in buffer[..].iter() {
+                    for v in buffer[..].iter() {
                         buf2.push(*v).unwrap();
                     }
                 };
@@ -112,7 +112,6 @@ fn main() -> ! {
                         panic!("should reset in release mode.");
                     }
                 };
-
 
                 // Note hprintln! requires semihosting. If hprintln! (thus also match section below) are
                 // removed then this example works on battery power with no computer attached.

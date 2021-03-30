@@ -87,15 +87,18 @@ use stm32f0xx_hal::{
     delay::Delay,
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
-    spi::{Error, Spi},
     serial::{Rx, Serial, Tx},
+    spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32f0xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
+    Tx<USART2>,
+    Rx<USART2>,
+) {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
 
     let cp = CorePeripherals::take().unwrap();
@@ -105,19 +108,22 @@ pub fn setup() -> (impl DelayMs<u32>
     let gpioa = p.GPIOA.split(&mut rcc);
     let gpiob = p.GPIOB.split(&mut rcc);
 
-    let (sck, miso, mosi, _rst, pa1, pb8, pb9, pa0) = cortex_m::interrupt::free(move |cs| {
-        (
-            gpioa.pa5.into_alternate_af0(cs), //    sck     on PA5
-            gpioa.pa6.into_alternate_af0(cs), //   miso     on PA6
-            gpioa.pa7.into_alternate_af0(cs), //   mosi     on PA7
-            //gpioa.pa1.into_push_pull_output(cs),  //  cs     on PA1
-            gpiob.pb1.into_push_pull_output(cs), //   reset    on PB1
-            gpioa.pa1.into_push_pull_output(cs), //   CsPin    on PA1
-            gpiob.pb8.into_floating_input(cs),   //   BusyPin  on PB8 DIO0
-            gpiob.pb9.into_floating_input(cs),   //   ReadyPin on PB9 DIO1
-            gpioa.pa0.into_push_pull_output(cs), //   ResetPin on PA0
-        )
-    });
+    let (sck, miso, mosi, _rst, pa1, pb8, pb9, pa0, tx, rx) =
+        cortex_m::interrupt::free(move |cs| {
+            (
+                gpioa.pa5.into_alternate_af0(cs), //    sck     on PA5
+                gpioa.pa6.into_alternate_af0(cs), //   miso     on PA6
+                gpioa.pa7.into_alternate_af0(cs), //   mosi     on PA7
+                //gpioa.pa1.into_push_pull_output(cs),  //  cs     on PA1
+                gpiob.pb1.into_push_pull_output(cs), //   reset    on PB1
+                gpioa.pa1.into_push_pull_output(cs), //   CsPin    on PA1
+                gpiob.pb8.into_floating_input(cs),   //   BusyPin  on PB8 DIO0
+                gpiob.pb9.into_floating_input(cs),   //   ReadyPin on PB9 DIO1
+                gpioa.pa0.into_push_pull_output(cs), //   ResetPin on PA0
+                gpioa.pa2.into_alternate_af1(cs),    //tx pa2  for GPS
+                gpioa.pa3.into_alternate_af1(cs),    //rx pa3  for GPS
+            )
+        });
 
     let spi = Spi::spi1(p.SPI1, (sck, miso, mosi), MODE, 8.mhz(), &mut rcc);
 
@@ -140,12 +146,8 @@ pub fn setup() -> (impl DelayMs<u32>
     //    but stm32f042  only has 2 usarts.
     //  Both have gpioa..into_alternate_af1(cs) USART2 with tx on pa2 and rx pa3
 
-    let (tx, rx) = cortex_m::interrupt::free(move |cs| {
-        (
-            gpioa.pa2.into_alternate_af1(cs), //tx pa2  for GPS
-            gpioa.pa3.into_alternate_af1(cs), //rx pa3  for GPS
-        )
-    });
+    // This is done for tx, rx above because move |cs| consumes gpioa
+    // let (tx, rx) = cortex_m::interrupt::free(move |cs| {...});
 
     let (tx, rx) = Serial::usart2(p.USART2, (tx, rx), 9600.bps(), &mut rcc).split();
 
@@ -155,18 +157,21 @@ pub fn setup() -> (impl DelayMs<u32>
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
+    device::USART2,
     pac::{CorePeripherals, Peripherals},
     prelude::*,
-    spi::{Error, Spi},
-    device::USART2,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
+    spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32f1xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
+    Tx<USART2>,
+    Rx<USART2>,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -214,7 +219,7 @@ pub fn setup() -> (impl DelayMs<u32>
         p.USART2,
         (
             gpioa.pa2.into_alternate_push_pull(&mut gpioa.crl), //tx pa2  for GPS rx
-            gpioa.pa3, //rx pa3  for GPS tx
+            gpioa.pa3,                                          //rx pa3  for GPS tx
         ),
         &mut afio.mapr,
         Config::default().baudrate(9_600.bps()),
@@ -222,7 +227,6 @@ pub fn setup() -> (impl DelayMs<u32>
         &mut rcc.apb1,
     )
     .split();
-
 
     (lora, tx, rx)
 }
@@ -232,15 +236,18 @@ use stm32f3xx_hal::{
     delay::Delay,
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
-    spi::{Error, Spi},
     serial::{Rx, Serial, Tx},
+    spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32f3xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
+    Tx<USART2>,
+    Rx<USART2>,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -315,9 +322,9 @@ use stm32f4xx_hal::{
     delay::Delay,
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
+    serial::{config::Config, Rx, Serial, Tx},
     spi::{Error, Spi},
     time::MegaHertz,
-    serial::{config::Config, Rx, Serial, Tx},
 };
 
 // If the type for the lora object is needed somewhere other than just in the setup() return type then it
@@ -333,10 +340,13 @@ use stm32f4xx_hal::{
 //    pub fn setup() ->  LoraType {
 
 #[cfg(feature = "stm32f4xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
+    Tx<USART2>,
+    Rx<USART2>,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -403,15 +413,18 @@ use stm32f7xx_hal::{
     delay::Delay,
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
-    spi::{ClockDivider, Error, Spi},
     serial::{Config, Oversampling, Rx, Serial, Tx},
+    spi::{ClockDivider, Error, Spi},
 };
 
 #[cfg(feature = "stm32f7xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
+    Tx<USART2>,
+    Rx<USART2>,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
@@ -429,12 +442,14 @@ pub fn setup() -> (impl DelayMs<u32>
     let spi =
         Spi::new(p.SPI1, (sck, miso, mosi)).enable::<u8>(&mut rcc.apb2, ClockDivider::DIV32, MODE);
 
+    //let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
     let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
 
     let delay = Delay::new(cp.SYST, clocks);
 
     // Create lora radio instance
 
+    // spi::new  partially consumes rcc which causes problem for second use of clocks
     let lora = Sx127x::spi(
         spi.compat(),                               //Spi
         gpioa.pa1.into_push_pull_output().compat(), //CsPin         on PA1
@@ -445,10 +460,6 @@ pub fn setup() -> (impl DelayMs<u32>
         &CONFIG_RADIO,                              //&Config
     )
     .unwrap(); // should handle error
-
-    // Relative to other hal setups, Serial::new is after spi::new because  clocks partially consumes rcc.
-    let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
-    //let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
 
     let (tx, rx) = Serial::new(
         p.USART2,
@@ -473,16 +484,19 @@ use stm32h7xx_hal::{
     delay::Delay,
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
+    serial::{Rx, Tx},
     spi::Error,
     Never,
-    serial::{Rx, Tx},
 };
 
 #[cfg(feature = "stm32h7xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, Never, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Never, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, Never, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, Never, Infallible>>,
+    Tx<USART2>,
+    Rx<USART2>,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let pwr = p.PWR.constrain();
@@ -544,15 +558,18 @@ use stm32l0xx_hal::{
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
-    spi::Error,
     serial::{Config, Rx, Serial2Ext, Tx},
+    spi::Error,
 };
 
 #[cfg(feature = "stm32l0xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, void::Void, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, void::Void, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>,
+    Tx<USART2>,
+    Rx<USART2>,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
@@ -604,16 +621,19 @@ pub fn setup() -> (impl DelayMs<u32>
 use stm32l1xx_hal::{
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
-    spi::Error,
-    stm32::{CorePeripherals, Peripherals, USART2},
     serial::{Config, Rx, SerialExt, Tx},
+    spi::Error,
+    stm32::{CorePeripherals, Peripherals, USART1},
 };
 
 #[cfg(feature = "stm32l1xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
+    Tx<USART1>,
+    Rx<USART1>,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi());
@@ -652,7 +672,7 @@ pub fn setup() -> (impl DelayMs<u32>
         .USART1
         .usart(
             (
-                gpioa.pa9, //tx pa9   for GPS rx
+                gpioa.pa9,  //tx pa9   for GPS rx
                 gpioa.pa10, //rx pa10  for GPS tx
             ),
             Config::default().baudrate(9600.bps()),
@@ -669,15 +689,18 @@ use stm32l4xx_hal::{
     delay::Delay,
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
-    spi::{Error, Spi},
     serial::{Config, Rx, Serial, Tx},
+    spi::{Error, Spi},
 };
 
 #[cfg(feature = "stm32l4xx")]
-pub fn setup() -> (impl DelayMs<u32>
-       + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
-       + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
-       Tx<USART2>, Rx<USART2>) {
+pub fn setup() -> (
+    impl DelayMs<u32>
+        + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
+        + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
+    Tx<USART2>,
+    Rx<USART2>,
+) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut flash = p.FLASH.constrain();
