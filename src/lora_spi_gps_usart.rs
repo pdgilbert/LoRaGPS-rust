@@ -80,27 +80,25 @@ pub const CONFIG_RADIO: radio_sx127x::device::Config = radio_sx127x::device::Con
     timeout_ms: 100,
 };
 
-
 // blink on board led to signal succesful transmit
 pub trait LED {
     fn on(&mut self) -> ();
     fn off(&mut self) -> ();
 }
 
-
 // setup() does all  hal/MCU specific setup and returns generic object for use in main code.
 
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
 use stm32f0xx_hal::{
     delay::Delay,
+    gpio::{gpioc::PC13, Output, PushPull},
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
-    gpio::{gpioc::PC13, Output, PushPull},
 };
 
-#[cfg(feature = "stm32f0xx")] 
+#[cfg(feature = "stm32f0xx")]
 use old_e_h::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f0xx")]
@@ -110,7 +108,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    PC13<Output<PushPull>>
+    PC13<Output<PushPull>>,
 ) {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
 
@@ -193,11 +191,11 @@ pub fn setup() -> (
 use stm32f1xx_hal::{
     delay::Delay,
     device::USART2,
+    gpio::{gpioc::PC13, Output, PushPull}, //OutputPin here  is private trait
     pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
     spi::{Error, Spi},
-    gpio::{gpioc::PC13, Output, PushPull},   //OutputPin here  is private trait 
 };
 
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
@@ -210,7 +208,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    PC13<Output<PushPull>>
+    PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -295,11 +293,11 @@ pub fn setup() -> (
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
+    gpio::{gpioe::PE15, Output, PushPull},
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
-    gpio::{gpioe::PE15, Output, PushPull},
 };
 
 #[cfg(feature = "stm32f3xx")]
@@ -309,7 +307,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    PE15<Output<PushPull>>
+    PE15<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -387,7 +385,9 @@ pub fn setup() -> (
     };
 
     //led on pe15 with on/off
-    let led = gpioe.pe15.into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
+    let led = gpioe
+        .pe15
+        .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
 
     (lora, tx, rx, led)
 }
@@ -396,12 +396,12 @@ pub fn setup() -> (
 // eg Nucleo-64 stm32f411, blackpill stm32f411, blackpill stm32f401
 use stm32f4xx_hal::{
     delay::Delay,
+    gpio::{gpioc::PC13, Output, PushPull},
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{config::Config, Rx, Serial, Tx},
     spi::{Error, Spi},
     time::MegaHertz,
-    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 // If the type for the lora object is needed somewhere other than just in the setup() return type then it
@@ -423,7 +423,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    PC13<Output<PushPull>>
+    PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -503,11 +503,11 @@ pub fn setup() -> (
 #[cfg(feature = "stm32f7xx")]
 use stm32f7xx_hal::{
     delay::Delay,
+    gpio::{gpioc::PC13, Output, PushPull},
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Config, Oversampling, Rx, Serial, Tx},
     spi::{ClockDivider, Error, Spi},
-    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 #[cfg(feature = "stm32f7xx")]
@@ -517,7 +517,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    PC13<Output<PushPull>>
+    PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -588,15 +588,15 @@ pub fn setup() -> (
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{
     delay::Delay,
+    gpio::{gpioc::PC13, Output, PushPull},
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Rx, Tx},
     spi::Error,
     Never,
-    gpio::{gpioc::PC13, Output, PushPull},
 };
 
-#[cfg(feature = "stm32h7xx")] 
+#[cfg(feature = "stm32h7xx")]
 use old_e_h::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32h7xx")]
@@ -606,7 +606,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Never, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    PC13<Output<PushPull>>
+    PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -678,12 +678,12 @@ pub fn setup() -> (
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
+    gpio::{gpioc::PC13, Output, PushPull},
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, Serial2Ext, Tx},
     spi::Error,
-    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 #[cfg(feature = "stm32l0xx")]
@@ -693,7 +693,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    PC13<Output<PushPull>>
+    PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -757,15 +757,15 @@ pub fn setup() -> (
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
+    gpio::{gpiob::PB6, Output, PushPull},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, SerialExt, Tx},
     spi::Error,
     stm32::{CorePeripherals, Peripherals, USART1},
-    gpio::{gpiob::PB6, Output, PushPull},
 };
 
-#[cfg(feature = "stm32l1xx")] 
+#[cfg(feature = "stm32l1xx")]
 use old_e_h::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32l1xx")]
@@ -775,7 +775,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART1>,
     Rx<USART1>,
-    PB6<Output<PushPull>>
+    PB6<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -841,11 +841,11 @@ pub fn setup() -> (
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
+    gpio::{gpioc::PC13, Output, PushPull},
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
     spi::{Error, Spi},
-    gpio::{gpioc::PC13, Output, PushPull},
 };
 
 #[cfg(feature = "stm32l4xx")]
@@ -855,7 +855,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    PC13<Output<PushPull>>
+    PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
@@ -935,7 +935,9 @@ pub fn setup() -> (
     };
 
     // led on pc13 with on/off
-    let led = gpioc.pc13.into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper); 
+    let led = gpioc
+        .pc13
+        .into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper);
 
     (lora, tx, rx, led)
 }

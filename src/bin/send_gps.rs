@@ -115,8 +115,8 @@ fn main() -> ! {
                         led.on();
                         let _ = lora.try_delay_ms(2u32);
                         led.off();
-                     }
-                     Err(_err) => {
+                    }
+                    Err(_err) => {
                         hprintln!("Error returned from lora.start_transmit().").unwrap();
                         //panic!("should reset in release mode.");
                     }
