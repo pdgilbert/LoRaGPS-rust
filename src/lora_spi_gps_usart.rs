@@ -171,7 +171,7 @@ pub fn setup() -> (
     //    fn off(&mut self) -> () {
     //        self.set_high().unwrap()
     //    }
-    //};
+    //}
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -180,7 +180,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // led on pc13 with on/off  above
 
@@ -274,7 +274,7 @@ pub fn setup() -> (
     //    fn off(&mut self) -> () {
     //        self.try_set_high().unwrap()
     //    }
-    //};
+    //}
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -283,7 +283,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13 with on/off
 
@@ -382,7 +382,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     //led on pe15 with on/off
     let led = gpioe
@@ -493,7 +493,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off (note delay is in lora)
 
@@ -578,7 +578,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
@@ -669,7 +669,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
@@ -748,7 +748,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
@@ -831,7 +831,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_low().unwrap()
         }
-    };
+    }
 
     let led = gpiob.pb6.into_push_pull_output(); // led on pb6 with on/off
 
@@ -932,7 +932,7 @@ pub fn setup() -> (
         fn off(&mut self) -> () {
             self.set_high().unwrap()
         }
-    };
+    }
 
     // led on pc13 with on/off
     let led = gpioc
