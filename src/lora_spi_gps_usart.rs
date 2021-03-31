@@ -100,6 +100,9 @@ use stm32f0xx_hal::{
     gpio::{gpioc::PC13, Output, PushPull},
 };
 
+#[cfg(feature = "stm32f0xx")] 
+use old_e_h::digital::v2::OutputPin;
+
 #[cfg(feature = "stm32f0xx")]
 pub fn setup() -> (
     impl DelayMs<u32>
@@ -117,6 +120,7 @@ pub fn setup() -> (
 
     let gpioa = p.GPIOA.split(&mut rcc);
     let gpiob = p.GPIOB.split(&mut rcc);
+    let gpioc = p.GPIOC.split(&mut rcc);
 
     let (sck, miso, mosi, _rst, pa1, pb8, pb9, pa0, tx, rx, led) =
         cortex_m::interrupt::free(move |cs| {
@@ -162,6 +166,24 @@ pub fn setup() -> (
 
     let (tx, rx) = Serial::usart2(p.USART2, (tx, rx), 9600.bps(), &mut rcc).split();
 
+    //impl LED for dyn OutputPin<Error = Infallible> {
+    //    fn on(&mut self) -> () {
+    //        self.set_low().unwrap()
+    //    }
+    //    fn off(&mut self) -> () {
+    //        self.set_high().unwrap()
+    //    }
+    //};
+
+    impl LED for PC13<Output<PushPull>> {
+        fn on(&mut self) -> () {
+            self.set_low().unwrap()
+        }
+        fn off(&mut self) -> () {
+            self.set_high().unwrap()
+        }
+    };
+
     // led on pc13 with on/off  above
 
     (lora, tx, rx, led)
@@ -175,8 +197,11 @@ use stm32f1xx_hal::{
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
     spi::{Error, Spi},
-    gpio::{gpioc::PC13, Output, OutputPin, PushPull},
+    gpio::{gpioc::PC13, Output, PushPull},   //OutputPin here  is private trait 
 };
+
+#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
+use old_e_h::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f1xx")]
 pub fn setup() -> (
@@ -200,6 +225,7 @@ pub fn setup() -> (
     let mut afio = p.AFIO.constrain(&mut rcc.apb2);
     let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
     let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
+    let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
 
     let spi = Spi::spi1(
         p.SPI1,
@@ -243,12 +269,21 @@ pub fn setup() -> (
     )
     .split();
 
-    impl LED for dyn OutputPin<Error = Infallible> {
+    //impl LED for dyn OutputPin<Error = Infallible> {
+    //    fn on(&mut self) -> () {
+    //        self.try_set_low().unwrap()
+    //    }
+    //    fn off(&mut self) -> () {
+    //        self.try_set_high().unwrap()
+    //    }
+    //};
+
+    impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.try_set_low().unwrap()
+            self.set_low().unwrap()
         }
         fn off(&mut self) -> () {
-            self.try_set_high().unwrap()
+            self.set_high().unwrap()
         }
     };
 
@@ -288,6 +323,7 @@ pub fn setup() -> (
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb);
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
+    let mut gpioe = p.GPIOE.split(&mut rcc.ahb);
 
     let spi = Spi::spi1(
         p.SPI1,
@@ -490,6 +526,7 @@ pub fn setup() -> (
 
     let gpioa = p.GPIOA.split();
     let gpiob = p.GPIOB.split();
+    let gpioc = p.GPIOC.split();
 
     let sck = gpioa.pa5.into_alternate_af5(); // sck   on PA5
     let miso = gpioa.pa6.into_alternate_af5(); // miso  on PA6
@@ -559,6 +596,9 @@ use stm32h7xx_hal::{
     gpio::{gpioc::PC13, Output, PushPull},
 };
 
+#[cfg(feature = "stm32h7xx")] 
+use old_e_h::digital::v2::OutputPin;
+
 #[cfg(feature = "stm32h7xx")]
 pub fn setup() -> (
     impl DelayMs<u32>
@@ -578,6 +618,7 @@ pub fn setup() -> (
 
     let gpioa = p.GPIOA.split(ccdr.peripheral.GPIOA);
     let gpiob = p.GPIOB.split(ccdr.peripheral.GPIOB);
+    let gpioc = p.GPIOC.split(ccdr.peripheral.GPIOC);
 
     // following github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/spi.rs
     let spi = p.SPI1.spi(
@@ -657,8 +698,10 @@ pub fn setup() -> (
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
     let mut rcc = p.RCC.freeze(rcc::Config::hsi16());
+
     let gpioa = p.GPIOA.split(&mut rcc);
     let gpiob = p.GPIOB.split(&mut rcc);
+    let gpioc = p.GPIOC.split(&mut rcc);
 
     // following  github.com/stm32-rs/stm32l0xx-hal/blob/master/examples/spi.rs
     let spi = p.SPI1.spi(
@@ -721,6 +764,9 @@ use stm32l1xx_hal::{
     stm32::{CorePeripherals, Peripherals, USART1},
     gpio::{gpiob::PB6, Output, PushPull},
 };
+
+#[cfg(feature = "stm32l1xx")] 
+use old_e_h::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32l1xx")]
 pub fn setup() -> (
@@ -825,6 +871,7 @@ pub fn setup() -> (
 
     let mut gpioa = p.GPIOA.split(&mut rcc.ahb2);
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb2);
+    let mut gpioc = p.GPIOC.split(&mut rcc.ahb2);
 
     let spi = Spi::spi1(
         p.SPI1,
