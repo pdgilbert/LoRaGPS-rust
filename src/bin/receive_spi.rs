@@ -23,7 +23,7 @@ use radio::Receive;
 
 use radio_sx127x::device::PacketInfo;
 
-use lora_gps::lora_spi_gps_usart::setup;
+use lora_gps::lora_spi_gps_usart::{setup, LED};
 
 fn to_str(x: &[u8]) -> &str {
     match core::str::from_utf8(x) {
@@ -34,7 +34,8 @@ fn to_str(x: &[u8]) -> &str {
 
 #[entry]
 fn main() -> ! {
-    let (mut lora, _rx, _tx) = setup(); //delay is available in lora.delay_ms()
+    let (mut lora, _rx, _tx, mut led) = setup(); //delay is available in lora.delay_ms()
+    led.off();
 
     lora.start_receive().unwrap(); // should handle error
 
@@ -53,7 +54,10 @@ fn main() -> ! {
                 //hprintln!("RX complete ({:?}, length: {})", info, n).unwrap();
                 //hprintln!("{:?}", &buff[..n]).unwrap();
                 // for some reason the next prints twice?
-                hprintln!("{}", to_str(&buff[..n])).unwrap()
+                hprintln!("{}", to_str(&buff[..n])).unwrap();
+                led.on();
+                let _ = lora.try_delay_ms(20u32);
+                led.off();
             }
 
             Ok(_v) => (), // hprint!(".").unwrap(),   // print "." if nothing received

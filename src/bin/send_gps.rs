@@ -35,6 +35,7 @@ fn main() -> ! {
     //hprintln!("id  {:?} length {:?}", id, id.len()).unwrap();
 
     let (mut lora, _tx_gps, mut rx_gps, mut led) = setup(); //  lora (delay is available in lora)
+    led.off();
 
     // byte buffer   Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
     let mut buffer: Vec<u8, consts::U80> = Vec::new();
@@ -100,7 +101,7 @@ fn main() -> ! {
                     //hprintln!("{:?}", &buf2).unwrap();
                     hprint!(".").unwrap(); // print "."  on transmit of $GPRMC message (but not others)
                     led.on(); // double blink on transmit of decoded message, one here and one below.
-                    let _ = lora.try_delay_ms(20u32);
+                    let _ = lora.try_delay_ms(2u32);
                     led.off();
                     let _ = lora.try_delay_ms(300u32);
                 } else {
@@ -112,7 +113,7 @@ fn main() -> ! {
                 match lora.start_transmit(&buf2) {
                     Ok(_b) => {
                         led.on();
-                        let _ = lora.try_delay_ms(20u32);
+                        let _ = lora.try_delay_ms(2u32);
                         led.off();
                      }
                      Err(_err) => {

@@ -19,7 +19,7 @@ use embedded_hal::blocking::delay::DelayMs;
 
 use radio::Transmit;
 
-use lora_gps::lora_spi_gps_usart::setup;
+use lora_gps::lora_spi_gps_usart::{setup, LED};
 
 #[entry]
 fn main() -> ! {
@@ -28,7 +28,8 @@ fn main() -> ! {
     // or  cargo:rustc-env=SENDER_ID="whatever"
     let id = option_env!("SENDER_ID").expect("Hello, LoRa!").as_bytes();
 
-    let (mut lora, _rx, _tx) = setup(); //delay is available in lora
+    let (mut lora, _rx, _tx, mut led) = setup(); //delay is available in lora
+    led.off();
 
     // print out configuration (for debugging)
 
@@ -51,15 +52,33 @@ fn main() -> ! {
     //let buffer = &[0xaa, 0xbb, 0xcc];
 
     let message = id;
-    //let message = b"Hello, LoRa!";
+    //let message = id + b"Hello, LoRa!";
 
+    // or use buffer vec as in send_gps.rs
     //let mut buffer = [0;100];      //Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
-    //for (i,c) in message.chars().enumerate() {
-    //        buffer[i] = c as u8;
+    //
+    // put id in first
+    //for (i,c) in id.enumerate()() {
+    //    buffer[i] = c as u8;
+    //}
+    //buffer[1 + id.len()] = b' ' as u8;
+    //
+    //for (i,c) in message.enumerate() {
+    //        buffer[i + 1 + id.len()] = c as u8;
     //        }
 
     loop {
-        lora.start_transmit(message).unwrap(); // should handle error
+        match lora.start_transmit(message) {
+            Ok(_b) => {
+                led.on();
+                let _ = lora.try_delay_ms(2u32); // very short
+                led.off();
+             }
+             Err(_err) => {
+                hprintln!("Error returned from lora.start_transmit().").unwrap();
+                //panic!("should reset in release mode.");
+            }
+        };
 
         match lora.check_transmit() {
             Ok(b) => {
