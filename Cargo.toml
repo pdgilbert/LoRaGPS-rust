@@ -57,7 +57,7 @@ radio-sx127x  = {  git = "https://github.com/pdgilbert/rust-radio-sx127x", defau
 radio         = { version = "0.8.1" }
 #  builds
 
-driver-pal    = { version = "0.8.0-alpha.0", default-features = false }
+driver-pal    = { version = "0.8.0-alpha.3", default-features = false }
 
 stm32f0xx-hal = { git = "https://github.com/stm32-rs/stm32f0xx-hal", optional = true }
 stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
