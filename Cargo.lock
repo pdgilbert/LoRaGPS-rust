@@ -729,7 +729,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#7ccd36028c474617c052c7a45c57b379c7bdf1a2"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#cf950ec9fefd1192a4cc3a435ee6f2c13904181c"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -791,7 +791,7 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#dbef30b7c1e8bd6338805cf0831581aeed6cd889"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#9a2e506899a74002aa11eae110b5db47ba5c75a1"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -874,13 +874,11 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#31d6fe3576cbce2b03fdef24a1df747225c7f8cd"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#62e15e8b0d8a018f0eb2730362b8465a3c64a943"
 dependencies = [
- "as-slice",
  "cast",
  "cortex-m 0.6.7",
  "embedded-hal 0.2.4",
- "generic-array 0.13.3",
  "nb 0.1.3",
  "rand_core 0.6.2",
  "stable_deref_trait",
