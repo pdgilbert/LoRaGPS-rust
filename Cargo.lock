@@ -137,7 +137,7 @@ checksum = "643a210c1bdc23d0db511e2a576082f4ff4dcae9d0c37f50b431b8f8439d6d6b"
 dependencies = [
  "bare-metal 0.2.5",
  "bitfield",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "volatile-register",
 ]
 
@@ -230,9 +230,9 @@ dependencies = [
 
 [[package]]
 name = "embedded-hal"
-version = "0.2.4"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa998ce59ec9765d15216393af37a58961ddcefb14c753b4816ba2191d865fcb"
+checksum = "db184d3fa27bc7a2344250394c0264144dfe0bc81a4401801dcb964b8dd172ad"
 dependencies = [
  "nb 0.1.3",
  "void",
@@ -253,7 +253,7 @@ version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2afb504e8ae78ede52799ea060abb3836fe2f7a24e8ac1cacb9086c5cfcabf7"
 dependencies = [
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "embedded-hal 1.0.0-alpha.4",
 ]
 
@@ -263,7 +263,7 @@ version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5571fd6dcf36d58537276ea736c97e7358cfad9da9d48fc0a001b302e78933f"
 dependencies = [
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "log",
 ]
 
@@ -339,9 +339,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.93"
+version = "0.2.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9385f66bf6105b241aa65a61cb923ef20efc665cb9f9bb50ac2f0c4b7f378d41"
+checksum = "18794a8ad5b29321f790b55d93dfba91e125cb1a9edbd4f8e3150acc771c1a5e"
 
 [[package]]
 name = "log"
@@ -360,7 +360,7 @@ dependencies = [
  "cortex-m-rt",
  "cortex-m-semihosting",
  "driver-pal",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "embedded-hal 1.0.0-alpha.4",
  "embedded-hal-compat",
  "embedded-spi",
@@ -550,7 +550,7 @@ source = "git+https://github.com/pdgilbert/rust-radio-sx127x#27d56e16bf5c0b55714
 dependencies = [
  "bitflags",
  "driver-pal",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "embedded-hal 1.0.0-alpha.4",
  "embedded-spi",
  "libc",
@@ -643,13 +643,13 @@ dependencies = [
 [[package]]
 name = "stm32f0xx-hal"
 version = "0.17.1"
-source = "git+https://github.com/stm32-rs/stm32f0xx-hal#06f783725ed271067a0a6f4f506f1a9da9210057"
+source = "git+https://github.com/stm32-rs/stm32f0xx-hal#8970b06de2463cd4d4ec14179dff2b12541751a7"
 dependencies = [
  "bare-metal 1.0.0",
  "bxcan",
  "cast",
  "cortex-m 0.7.2",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 1.0.0",
  "stm32f0",
  "void",
@@ -677,7 +677,7 @@ dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
  "stm32f1",
  "void",
@@ -698,13 +698,13 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#231c9592508d85d72e4f54b5f408d42546184ea4"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#31ca8a38ae9908a7cea4fbdb25d7467b244f013b"
 dependencies = [
  "cfg-if",
  "cortex-m 0.7.2",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "embedded-time",
  "nb 1.0.0",
  "paste",
@@ -729,14 +729,14 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#cf950ec9fefd1192a4cc3a435ee6f2c13904181c"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#bb160bbe8604bccf28557975131d0afdb2fa1014"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
  "cortex-m 0.7.2",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 1.0.0",
  "rand_core 0.6.2",
  "rtcc",
@@ -758,8 +758,8 @@ dependencies = [
 
 [[package]]
 name = "stm32f7xx-hal"
-version = "0.2.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#76d0fcdd9416fca97944999791a8bb538329fa32"
+version = "0.3.0"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#850131aab92ced30b9d9db8069efd77613340524"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",
@@ -767,7 +767,7 @@ dependencies = [
  "cast",
  "cortex-m 0.6.7",
  "cortex-m-rt",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "micromath",
  "nb 0.1.3",
  "rand_core 0.5.1",
@@ -791,14 +791,14 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#9a2e506899a74002aa11eae110b5db47ba5c75a1"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#762f50482f364f5cefe9bd7f98b026472dc45519"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
  "cortex-m 0.7.2",
  "cortex-m-rt",
  "embedded-dma",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 1.0.0",
  "paste",
  "stm32h7",
@@ -827,7 +827,7 @@ dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
  "cortex-m-semihosting",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
  "stm32l0",
  "void",
@@ -853,7 +853,7 @@ dependencies = [
  "bare-metal 0.2.5",
  "cast",
  "cortex-m 0.5.11",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
  "stm32l1",
  "void",
@@ -874,11 +874,11 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#62e15e8b0d8a018f0eb2730362b8465a3c64a943"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#284c5e49cb25809c4e0e25cabf628ce0679257e3"
 dependencies = [
  "cast",
  "cortex-m 0.6.7",
- "embedded-hal 0.2.4",
+ "embedded-hal 0.2.5",
  "nb 0.1.3",
  "rand_core 0.6.2",
  "stable_deref_trait",
@@ -888,9 +888,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.69"
+version = "1.0.71"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48fe99c6bd8b1cc636890bcc071842de909d902c81ac7dab53ba33c421ab8ffb"
+checksum = "ad184cc9470f9117b2ac6817bfe297307418819ba40552f9b3846f05c33d5373"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -911,9 +911,9 @@ checksum = "56dee185309b50d1f11bfedef0fe6d036842e3fb77413abef29f8f8d1c5d4c1c"
 
 [[package]]
 name = "unicode-xid"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
+checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"
 
 [[package]]
 name = "vcell"
