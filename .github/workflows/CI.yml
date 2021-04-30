@@ -101,11 +101,11 @@ jobs:
         with:
           command: tree
 
-      - name: tree e-h 0.2.4
+      - name: tree e-h 0.2.5
         uses: actions-rs/cargo@v1 
         with:
           command: tree
-          args:  -i -p embedded-hal:0.2.4
+          args:  -i -p embedded-hal:0.2.5
 
       - name: tree e-h 1.0.0-alpha.4
         uses: actions-rs/cargo@v1 
