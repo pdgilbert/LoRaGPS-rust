@@ -80,6 +80,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
+name = "camino"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4648c6d00a709aa069a236adcaae4f605a6241c72bf5bee79331a4b625921a9"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "cargo-platform"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0226944a63d1bf35a3b5f948dd7c59e263db83695c9e8bffc4037de02e30f1d7"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "cargo_metadata"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "081e3f0755c1f380c2d010481b6fa2e02973586d5f2b24eebb7a2a1d98b143d8"
+dependencies = [
+ "camino",
+ "cargo-platform",
+ "semver 0.11.0",
+ "semver-parser 0.10.2",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "cast"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -168,7 +200,7 @@ version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bffa6c1454368a6aa4811ae60964c38e6996d397ff8095a8b9211b1c1f749bc"
 dependencies = [
- "cortex-m 0.7.2",
+ "cortex-m 0.5.11",
 ]
 
 [[package]]
@@ -338,6 +370,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "itoa"
+version = "0.4.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
+
+[[package]]
 name = "libc"
 version = "0.2.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -356,7 +394,7 @@ dependencies = [
 name = "lora_gps"
 version = "0.1.0"
 dependencies = [
- "cortex-m 0.7.2",
+ "cortex-m 0.6.7",
  "cortex-m-rt",
  "cortex-m-semihosting",
  "driver-pal",
@@ -488,7 +526,7 @@ version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d55dedd501dfd02514646e0af4d7016ce36bc12ae177ef52056989966a1eec"
 dependencies = [
- "cortex-m 0.7.2",
+ "cortex-m 0.5.11",
  "cortex-m-semihosting",
 ]
 
@@ -590,6 +628,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "ryu"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e"
+
+[[package]]
 name = "semver"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -605,6 +649,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f301af10236f6df4160f7c3f04eec6dbc70ace82d23326abad5edee88801c6b6"
 dependencies = [
  "semver-parser 0.10.2",
+ "serde",
 ]
 
 [[package]]
@@ -623,6 +668,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde"
+version = "1.0.125"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "558dc50e1a5a5fa7112ca2ce4effcb321b0300c0d4ccf0776a9f60cd89031171"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.125"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b093b7a2bb58203b5da3056c05b4ec1fed827dcfdb37347a8841695263b3d06d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "serde_json"
+version = "1.0.64"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
+dependencies = [
+ "itoa",
+ "ryu",
+ "serde",
+]
+
+[[package]]
+name = "slice-group-by"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f7474f0b646d228360ab62ed974744617bc869d959eac8403bfa3665931a7fb"
+
+[[package]]
 name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -635,7 +717,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28343c6b129971d2d8f26a525b239d4d6e30ed610892603cedbe4f24e17656b5"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.7.2",
+ "cortex-m 0.5.11",
  "cortex-m-rt",
  "vcell",
 ]
@@ -690,7 +772,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e212ebc31a11c94edb709de8bb6cb93b96eeb687283855ba814d4a2596bd70d"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.7.2",
+ "cortex-m 0.5.11",
  "cortex-m-rt",
  "vcell",
 ]
@@ -698,8 +780,9 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#31ca8a38ae9908a7cea4fbdb25d7467b244f013b"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#7a12c20c89e7c88871710674d257fbbd1d17a4c7"
 dependencies = [
+ "cargo_metadata",
  "cfg-if",
  "cortex-m 0.7.2",
  "cortex-m-rt",
@@ -709,6 +792,7 @@ dependencies = [
  "nb 1.0.0",
  "paste",
  "rtcc",
+ "slice-group-by",
  "stm32f3",
  "typenum",
  "void",
@@ -721,7 +805,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da3d56009c8f32e4f208dbea17df72484154d1040a8969b75d8c73eb7b18fe8f"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.7.2",
+ "cortex-m 0.5.11",
  "cortex-m-rt",
  "vcell",
 ]
@@ -783,7 +867,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b672c837e0ee8158ecc7fce0f9a948dd0693a9c588338e728d14b73307a0b7d"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.7.2",
+ "cortex-m 0.5.11",
  "cortex-m-rt",
  "vcell",
 ]
@@ -866,7 +950,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed7a745bcb28997249c1b2f866f4cfa27e5d153a478141e590f56190d34568f2"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.7.2",
+ "cortex-m 0.5.11",
  "cortex-m-rt",
  "vcell",
 ]
