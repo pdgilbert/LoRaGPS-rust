@@ -407,7 +407,8 @@ pub fn setup() -> (
 use stm32f4xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::{CorePeripherals, Peripherals, USART2},
+    i2c::{I2c, Pins},
+    pac::{CorePeripherals, Peripherals, USART2, I2C2},
     prelude::*,
     serial::{config::Config, Rx, Serial, Tx},
     spi::{Error, Spi},
@@ -433,6 +434,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    I2c<I2C2, impl Pins<I2C2>>,
     PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -494,6 +496,11 @@ pub fn setup() -> (
     .unwrap()
     .split();
 
+    let scl = gpiob.pb10.into_alternate_af4().set_open_drain(); // scl on PB10
+    let sda = gpiob.pb3.into_alternate_af9().set_open_drain(); // sda on PB3
+
+    let i2c = I2c::new(p.I2C2, (scl, sda), 400.khz(), clocks);
+
     // Note that blackpill with stm32f411 and nucleo-64 with stm32f411 have onboard led wired
     // differently. Next will be reversed for nucleo-64 (in addition to PA5 vs PC13).
     impl LED for PC13<Output<PushPull>> {
@@ -507,7 +514,7 @@ pub fn setup() -> (
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off (note delay is in lora)
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 #[cfg(feature = "stm32f7xx")]

@@ -1,6 +1,6 @@
 //! Serial interface read GPS on usart and transmit with LoRa using crate radio_sx127x (on SPI).
 //!  Using  sck, miso, mosi, cs, reset and D00, D01. Not yet using  D02, D03
-//!  For pin connections see the setup() sections in src/lora_spi.rs and src/gps_usart.rs.
+//!  For pin connections see the setup() sections in src/lora_spigps_usart.rs.
 //! Tested using an RFM95 style radio.
 
 #![no_std]
@@ -34,7 +34,7 @@ fn main() -> ! {
 
     //hprintln!("id  {:?} length {:?}", id, id.len()).unwrap();
 
-    let (mut lora, _tx_gps, mut rx_gps, mut led) = setup(); //  lora (delay is available in lora)
+    let (mut lora, _tx_gps, mut rx_gps, _i2c, mut led) = setup(); //  lora (delay is available in lora)
     led.off();
 
     // byte buffer   Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
