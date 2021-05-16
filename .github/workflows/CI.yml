@@ -2,7 +2,7 @@ name: LoRaGPS-rust
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, add-monitor ]
   pull_request:
     branches: [ master ]
 
