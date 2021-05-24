@@ -39,7 +39,7 @@ fn main() -> ! {
 
     // byte buffer   Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
     let mut buffer: Vec<u8, 80> = Vec::new(); // up to 80  u8 elements on stack
-    let mut buf2:   Vec<u8, 80> = Vec::new(); // up to 80  u8 elements on stack
+    let mut buf2: Vec<u8, 80> = Vec::new(); // up to 80  u8 elements on stack
 
     //hprintln!("buffer at {} of {}", buffer.len(), buffer.capacity()).unwrap();  //0 of 80
     //hprintln!("buf2   at {} of {}",   buf2.len(),   buf2.capacity()).unwrap();  //0 of 80
