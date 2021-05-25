@@ -88,6 +88,8 @@ pub trait LED {
 
 // setup() does all  hal/MCU specific setup and returns generic object for use in main code.
 
+#[cfg(feature = "stm32f030xc")]
+use stm32f0xx_hal::pac::I2C2 as I2C;
 #[cfg(feature = "stm32f0xx")] //  eg stm32f030xc, stm32f042
 use stm32f0xx_hal::{
     delay::Delay,
@@ -98,11 +100,9 @@ use stm32f0xx_hal::{
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
 };
-#[cfg(feature = "stm32f030xc")]
-use stm32f0xx_hal::pac:: I2C2 as I2C;
 
 #[cfg(feature = "stm32f042")]
-use stm32f0xx_hal::pac:: I2C1 as I2C;
+use stm32f0xx_hal::pac::I2C1 as I2C;
 
 #[cfg(feature = "stm32f0xx")]
 use old_e_h::digital::v2::OutputPin;
@@ -141,8 +141,8 @@ pub fn setup() -> (
                 gpioa.pa0.into_push_pull_output(cs), //   ResetPin on PA0
                 gpioa.pa2.into_alternate_af1(cs),    //tx pa2  for GPS
                 gpioa.pa3.into_alternate_af1(cs),    //rx pa3  for GPS
-                gpiob.pb10.into_alternate_af1(cs),  // scl on PB10
-                gpiob.pb11.into_alternate_af1(cs),  // sda on PB11
+                gpiob.pb10.into_alternate_af1(cs),   // scl on PB10
+                gpiob.pb11.into_alternate_af1(cs),   // sda on PB11
                 gpioc.pc13.into_push_pull_output(cs), //led
             )
         });
@@ -173,9 +173,9 @@ pub fn setup() -> (
 
     let (tx, rx) = Serial::usart2(p.USART2, (tx, rx), 9600.bps(), &mut rcc).split();
 
-#[cfg(feature = "stm32f030xc")]
+    #[cfg(feature = "stm32f030xc")]
     let i2c = I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), &mut rcc);
-#[cfg(feature = "stm32f042")]
+    #[cfg(feature = "stm32f042")]
     let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), &mut rcc);
 
     //impl LED for dyn OutputPin<Error = Infallible> {
@@ -204,9 +204,9 @@ pub fn setup() -> (
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
+    device::I2C2,
     device::USART2,
     gpio::{gpioc::PC13, Output, PushPull},
-    device::I2C2,
     i2c::{BlockingI2c, DutyCycle, Pins},
     pac::{CorePeripherals, Peripherals},
     prelude::*,
@@ -431,7 +431,7 @@ pub fn setup() -> (
         .into_af4_open_drain(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh);
 
     let i2c = I2c::new(p.I2C2, (scl, sda), 400_000.Hz(), clocks, &mut rcc.apb1);
-    
+
     impl LED for PE15<Output<PushPull>> {
         fn on(&mut self) -> () {
             self.set_high().unwrap()
@@ -455,7 +455,7 @@ use stm32f4xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     i2c::{I2c, Pins},
-    pac::{CorePeripherals, Peripherals, USART2, I2C2},
+    pac::{CorePeripherals, Peripherals, I2C2, USART2},
     prelude::*,
     serial::{config::Config, Rx, Serial, Tx},
     spi::{Error, Spi},
@@ -641,13 +641,13 @@ pub fn setup() -> (
     let sda = gpiob.pb11.into_alternate_af4().set_open_drain();
 
     let i2c = BlockingI2c::i2c2(
-            p.I2C2,
-            (scl, sda),
-            stm32f7xx_hal::i2c::Mode::standard(400_000.hz()),
-            clocks,
-            &mut rcc.apb1,
-            1000,
-        );
+        p.I2C2,
+        (scl, sda),
+        stm32f7xx_hal::i2c::Mode::standard(400_000.hz()),
+        clocks,
+        &mut rcc.apb1,
+        1000,
+    );
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -744,9 +744,10 @@ pub fn setup() -> (
 
     let scl = gpiob.pb10.into_alternate_af4().set_open_drain();
     let sda = gpiob.pb11.into_alternate_af4().set_open_drain();
-    
-    let i2c = p.I2C2
-            .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C2, &clocks);
+
+    let i2c = p
+        .I2C2
+        .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C2, &clocks);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -869,7 +870,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART1>,
     Rx<USART1>,
-    I2c<I2C1, impl Pins<I2C1>>, 
+    I2c<I2C1, impl Pins<I2C1>>,
     PB6<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -921,7 +922,7 @@ pub fn setup() -> (
 
     let scl = gpiob.pb8.into_open_drain_output();
     let sda = gpiob.pb9.into_open_drain_output();
-    
+
     let i2c = p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc);
 
     impl LED for PB6<Output<PushPull>> {
