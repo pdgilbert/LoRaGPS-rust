@@ -10,28 +10,13 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  fmt:
-    name: Rustfmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all  -- --check
-
   test_bin:
     name: bin
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       matrix:
-        brd: [none-stm32f030,      none-stm32f100,      none-stm32f042,      none-stm32f101,      
+        brd: [none-stm32f030,      none-stm32f042,      none-stm32f100,      none-stm32f101,      
               bluepill,            discovery-stm32f303, blackpill-stm32f401, blackpill-stm32f411, 
               none-stm32f722,      none-stm32h742,      none-stm32l0x2,      discovery-stm32l100, 
               heltec-lora-node151, none-stm32l4x2 ]
@@ -134,4 +119,20 @@ jobs:
       #    command: build
       #    args:  --release --target ${{ matrix.trg }} --features ${{ matrix.hal }},${{ matrix.mcu }} --bin ${{ matrix.bin }}
       #    use-cross: true
+  
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all  -- --check
+
 
