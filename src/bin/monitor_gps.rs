@@ -21,7 +21,7 @@ use cortex_m::prelude::_embedded_hal_adc_OneShot;
 use embedded_hal::blocking::delay::DelayMs;
 use radio::Transmit;
 
-use heapless::{consts, Vec};
+use heapless::{String, Vec};
 use nb::block;
 
 //use embedded_hal::serial::Read;
@@ -53,7 +53,7 @@ fn display(
            //disp : impl DrawTarget<BinaryColor> + WriteOnlyDataCommand, 
            //disp : impl DrawTarget<BinaryColor> + cortex_m::prelude::_embedded_hal_serial_Write, 
            text_style : TextStyle<BinaryColor, Font8x16>) -> () {
-    let mut lines: [heapless::String<heapless::consts::U32>; 4] = [
+    let mut lines: [String<32>; 4] = [
         heapless::String::new(),
         heapless::String::new(),
         heapless::String::new(),
@@ -114,8 +114,8 @@ fn main() -> ! {
     // LoRa setup
    
     // byte buffer   Nov 2020 limit data.len() < 255 in radio_sx127x  .start_transmit
-    let mut buffer: Vec<u8, consts::U80> = Vec::new();
-    let mut buf2: Vec<u8, consts::U80> = Vec::new();
+    let mut buffer: Vec<u8, 80> = Vec::new(); // up to 80  u8 elements on stack
+    let mut buf2: Vec<u8, 80> = Vec::new(); // up to 80  u8 elements on stack
 
     buffer.clear();
     buf2.clear();

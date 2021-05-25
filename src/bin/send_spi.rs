@@ -28,7 +28,7 @@ fn main() -> ! {
     // or  cargo:rustc-env=SENDER_ID="whatever"
     let id = option_env!("SENDER_ID").expect("Hello, LoRa!").as_bytes();
 
-    let (mut lora, _rx, _tx, mut led) = setup(); //delay is available in lora
+    let (mut lora, _rx, _tx, _i2c, mut led) = setup(); //delay is available in lora
     led.off();
 
     // print out configuration (for debugging)

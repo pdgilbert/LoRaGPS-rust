@@ -34,7 +34,7 @@ fn to_str(x: &[u8]) -> &str {
 
 #[entry]
 fn main() -> ! {
-    let (mut lora, _rx, _tx, mut led) = setup(); //delay is available in lora.delay_ms()
+    let (mut lora, _rx, _tx, _i2c, mut led) = setup(); //delay is available in lora.delay_ms()
     led.off();
 
     lora.start_receive().unwrap(); // should handle error

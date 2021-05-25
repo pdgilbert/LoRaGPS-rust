@@ -92,7 +92,8 @@ pub trait LED {
 use stm32f0xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::{CorePeripherals, Peripherals, USART2},
+    i2c::{I2c, SclPin, SdaPin},
+    pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
@@ -108,6 +109,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    I2c<I2C1, impl SclPin<I2C1>, impl SdaPin<I2C1>>,
     PC13<Output<PushPull>>,
 ) {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
@@ -120,7 +122,7 @@ pub fn setup() -> (
     let gpiob = p.GPIOB.split(&mut rcc);
     let gpioc = p.GPIOC.split(&mut rcc);
 
-    let (sck, miso, mosi, _rst, pa1, pb8, pb9, pa0, tx, rx, led) =
+    let (sck, miso, mosi, _rst, pa1, pb8, pb9, pa0, tx, rx, scl, sda, led) =
         cortex_m::interrupt::free(move |cs| {
             (
                 gpioa.pa5.into_alternate_af0(cs), //    sck     on PA5
@@ -134,6 +136,8 @@ pub fn setup() -> (
                 gpioa.pa0.into_push_pull_output(cs), //   ResetPin on PA0
                 gpioa.pa2.into_alternate_af1(cs),    //tx pa2  for GPS
                 gpioa.pa3.into_alternate_af1(cs),    //rx pa3  for GPS
+                gpiob.pb10.into_alternate_af1(cs),  // scl on PB10
+                gpiob.pb11.into_alternate_af1(cs),  // sda on PB11
                 gpioc.pc13.into_push_pull_output(cs), //led
             )
         });
@@ -164,6 +168,8 @@ pub fn setup() -> (
 
     let (tx, rx) = Serial::usart2(p.USART2, (tx, rx), 9600.bps(), &mut rcc).split();
 
+    let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), &mut rcc);
+
     //impl LED for dyn OutputPin<Error = Infallible> {
     //    fn on(&mut self) -> () {
     //        self.set_low().unwrap()
@@ -184,14 +190,16 @@ pub fn setup() -> (
 
     // led on pc13 with on/off  above
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 #[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
 use stm32f1xx_hal::{
     delay::Delay,
     device::USART2,
-    gpio::{gpioc::PC13, Output, PushPull}, //OutputPin here  is private trait
+    gpio::{gpioc::PC13, Output, PushPull},
+    device::I2C2,
+    i2c::{BlockingI2c, DutyCycle, Pins},
     pac::{CorePeripherals, Peripherals},
     prelude::*,
     serial::{Config, Rx, Serial, Tx}, //, StopBits
@@ -208,6 +216,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    BlockingI2c<I2C2, impl Pins<I2C2>>,
     PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -267,6 +276,25 @@ pub fn setup() -> (
     )
     .split();
 
+    let i2c = BlockingI2c::i2c2(
+        p.I2C2,
+        (
+            gpiob.pb10.into_alternate_open_drain(&mut gpiob.crh), // scl on PB10
+            gpiob.pb11.into_alternate_open_drain(&mut gpiob.crh), // sda on PB11
+        ),
+        //&mut afio.mapr,  need this for i2c1 but not i2c2
+        stm32f1xx_hal::i2c::Mode::Fast {
+            frequency: 400_000.hz(),
+            duty_cycle: DutyCycle::Ratio2to1,
+        },
+        clocks,
+        &mut rcc.apb1,
+        1000,
+        10,
+        1000,
+        1000,
+    );
+
     //impl LED for dyn OutputPin<Error = Infallible> {
     //    fn on(&mut self) -> () {
     //        self.try_set_low().unwrap()
@@ -287,14 +315,15 @@ pub fn setup() -> (
 
     let led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh); // led on pc13 with on/off
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 #[cfg(feature = "stm32f3xx")] //  eg Discovery-stm32f303
 use stm32f3xx_hal::{
     delay::Delay,
     gpio::{gpioe::PE15, Output, PushPull},
-    pac::{CorePeripherals, Peripherals, USART2},
+    i2c::{I2c, SclPin, SdaPin},
+    pac::{CorePeripherals, Peripherals, I2C2, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
@@ -307,6 +336,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    I2c<I2C2, (impl SclPin<I2C2>, impl SdaPin<I2C2>)>,
     PE15<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -385,6 +415,15 @@ pub fn setup() -> (
     )
     .split();
 
+    let scl = gpioa
+        .pa9
+        .into_af4_open_drain(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh);
+    let sda = gpioa
+        .pa10
+        .into_af4_open_drain(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrh);
+
+    let i2c = I2c::new(p.I2C2, (scl, sda), 400_000.Hz(), clocks, &mut rcc.apb1);
+    
     impl LED for PE15<Output<PushPull>> {
         fn on(&mut self) -> () {
             self.set_high().unwrap()
@@ -399,7 +438,7 @@ pub fn setup() -> (
         .pe15
         .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 #[cfg(feature = "stm32f4xx")]
@@ -521,7 +560,8 @@ pub fn setup() -> (
 use stm32f7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::{CorePeripherals, Peripherals, USART2},
+    i2c::{BlockingI2c, PinScl, PinSda},
+    pac::{CorePeripherals, Peripherals, I2C2, USART2},
     prelude::*,
     serial::{Config, Oversampling, Rx, Serial, Tx},
     spi::{ClockDivider, Error, Spi},
@@ -534,6 +574,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    BlockingI2c<I2C2, impl PinScl<I2C2>, impl PinSda<I2C2>>,
     PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -588,6 +629,18 @@ pub fn setup() -> (
     )
     .split();
 
+    let scl = gpiob.pb10.into_alternate_af4().set_open_drain();
+    let sda = gpiob.pb11.into_alternate_af4().set_open_drain();
+
+    let i2c = BlockingI2c::i2c2(
+            p.I2C2,
+            (scl, sda),
+            stm32f7xx_hal::i2c::Mode::standard(400_000.hz()),
+            clocks,
+            &mut rcc.apb1,
+            1000,
+        );
+
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
             self.set_low().unwrap()
@@ -599,14 +652,15 @@ pub fn setup() -> (
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 #[cfg(feature = "stm32h7xx")]
 use stm32h7xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::{CorePeripherals, Peripherals, USART2},
+    i2c::I2c,
+    pac::{CorePeripherals, Peripherals, I2C2, USART2},
     prelude::*,
     serial::{Rx, Tx},
     spi::Error,
@@ -623,6 +677,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Never, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    I2c<I2C2>,
     PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -679,6 +734,12 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
+    let scl = gpiob.pb10.into_alternate_af4().set_open_drain();
+    let sda = gpiob.pb11.into_alternate_af4().set_open_drain();
+    
+    let i2c = p.I2C2
+            .i2c((scl, sda), 400.khz(), ccdr.peripheral.I2C2, &clocks);
+
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
             self.set_low().unwrap()
@@ -690,12 +751,13 @@ pub fn setup() -> (
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 #[cfg(feature = "stm32l0xx")]
 use stm32l0xx_hal::{
     gpio::{gpioc::PC13, Output, PushPull},
+    i2c::{I2c, SCLPin, SDAPin},
     pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
@@ -710,6 +772,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
     PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -758,6 +821,11 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
+    let scl = gpiob.pb8.into_open_drain_output(); // scl on PB8
+    let sda = gpiob.pb9.into_open_drain_output(); // sda on PB9
+
+    let i2c = p.I2C1.i2c(sda, scl, 400.khz(), &mut rcc);
+
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
             self.set_low().unwrap()
@@ -769,17 +837,18 @@ pub fn setup() -> (
 
     let led = gpioc.pc13.into_push_pull_output(); // led on pc13 with on/off
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 #[cfg(feature = "stm32l1xx")] // eg  Discovery kit stm32l100 and Heltec lora_node STM32L151CCU6
 use stm32l1xx_hal::{
     gpio::{gpiob::PB6, Output, PushPull},
+    i2c::{I2c, Pins},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, SerialExt, Tx},
     spi::Error,
-    stm32::{CorePeripherals, Peripherals, USART1},
+    stm32::{CorePeripherals, Peripherals, I2C1, USART1},
 };
 
 #[cfg(feature = "stm32l1xx")]
@@ -792,6 +861,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART1>,
     Rx<USART1>,
+    I2c<I2C1, impl Pins<I2C1>>, 
     PB6<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -841,6 +911,11 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
+    let scl = gpiob.pb8.into_open_drain_output();
+    let sda = gpiob.pb9.into_open_drain_output();
+    
+    let i2c = p.I2C1.i2c((scl, sda), 400.khz(), &mut rcc);
+
     impl LED for PB6<Output<PushPull>> {
         fn on(&mut self) -> () {
             self.set_high().unwrap()
@@ -852,14 +927,15 @@ pub fn setup() -> (
 
     let led = gpiob.pb6.into_push_pull_output(); // led on pb6 with on/off
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 #[cfg(feature = "stm32l4xx")]
 use stm32l4xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    pac::{CorePeripherals, Peripherals, USART2},
+    i2c::{I2c, SclPin, SdaPin},
+    pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
     spi::{Error, Spi},
@@ -872,6 +948,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
+    I2c<I2C1, (impl SclPin<I2C1>, impl SdaPin<I2C1>)>,
     PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -942,6 +1019,20 @@ pub fn setup() -> (
     )
     .split();
 
+    let mut scl = gpioa
+        .pa9
+        .into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper); // scl on PA9
+    scl.internal_pull_up(&mut gpioa.pupdr, true);
+    let scl = scl.into_af4(&mut gpioa.moder, &mut gpioa.afrh);
+
+    let mut sda = gpioa
+        .pa10
+        .into_open_drain_output(&mut gpioa.moder, &mut gpioa.otyper); // sda on PA10
+    sda.internal_pull_up(&mut gpioa.pupdr, true);
+    let sda = sda.into_af4(&mut gpioa.moder, &mut gpioa.afrh);
+
+    let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1);
+
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
             self.set_low().unwrap()
@@ -956,7 +1047,7 @@ pub fn setup() -> (
         .pc13
         .into_push_pull_output(&mut gpioc.moder, &mut gpioc.otyper);
 
-    (lora, tx, rx, led)
+    (lora, tx, rx, i2c, led)
 }
 
 // End of hal/MCU specific setup. Following should be generic code.
