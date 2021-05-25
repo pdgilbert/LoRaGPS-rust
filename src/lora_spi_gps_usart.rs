@@ -88,16 +88,21 @@ pub trait LED {
 
 // setup() does all  hal/MCU specific setup and returns generic object for use in main code.
 
-#[cfg(feature = "stm32f0xx")] //  eg stm32f030xc
+#[cfg(feature = "stm32f0xx")] //  eg stm32f030xc, stm32f042
 use stm32f0xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
     i2c::{I2c, SclPin, SdaPin},
-    pac::{CorePeripherals, Peripherals, I2C1, USART2},
+    pac::{CorePeripherals, Peripherals, USART2},
     prelude::*,
     serial::{Rx, Serial, Tx},
     spi::{Error, Spi},
 };
+#[cfg(feature = "stm32f030xc")]
+use stm32f0xx_hal::pac:: I2C2 as I2C;
+
+#[cfg(feature = "stm32f042")]
+use stm32f0xx_hal::pac:: I2C1 as I2C;
 
 #[cfg(feature = "stm32f0xx")]
 use old_e_h::digital::v2::OutputPin;
@@ -109,7 +114,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    I2c<I2C1, impl SclPin<I2C1>, impl SdaPin<I2C1>>,
+    I2c<I2C, impl SclPin<I2C>, impl SdaPin<I2C>>,
     PC13<Output<PushPull>>,
 ) {
     //  Infallible, Infallible   reflect the error type on the spi and gpio traits.
@@ -168,6 +173,9 @@ pub fn setup() -> (
 
     let (tx, rx) = Serial::usart2(p.USART2, (tx, rx), 9600.bps(), &mut rcc).split();
 
+#[cfg(feature = "stm32f030xc")]
+    let i2c = I2c::i2c2(p.I2C2, (scl, sda), 400.khz(), &mut rcc);
+#[cfg(feature = "stm32f042")]
     let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), &mut rcc);
 
     //impl LED for dyn OutputPin<Error = Infallible> {
@@ -758,7 +766,7 @@ pub fn setup() -> (
 use stm32l0xx_hal::{
     gpio::{gpioc::PC13, Output, PushPull},
     i2c::{I2c, SCLPin, SDAPin},
-    pac::{CorePeripherals, Peripherals, USART2},
+    pac::{CorePeripherals, Peripherals, I2C2, USART2},
     prelude::*,
     rcc, // for ::Config but note name conflict with serial
     serial::{Config, Rx, Serial2Ext, Tx},
@@ -772,7 +780,7 @@ pub fn setup() -> (
         + Receive<Info = PacketInfo, Error = sx127xError<Error, void::Void, Infallible>>,
     Tx<USART2>,
     Rx<USART2>,
-    I2c<I2C1, PB9<Output<OpenDrain>>, PB8<Output<OpenDrain>>>,
+    I2c<I2C2, impl SDAPin<I2C2>, impl SCLPin<I2C2>>,
     PC13<Output<PushPull>>,
 ) {
     let cp = CorePeripherals::take().unwrap();
@@ -821,10 +829,10 @@ pub fn setup() -> (
         .unwrap()
         .split();
 
-    let scl = gpiob.pb8.into_open_drain_output(); // scl on PB8
-    let sda = gpiob.pb9.into_open_drain_output(); // sda on PB9
+    let scl = gpiob.pb10.into_open_drain_output();
+    let sda = gpiob.pb11.into_open_drain_output();
 
-    let i2c = p.I2C1.i2c(sda, scl, 400.khz(), &mut rcc);
+    let i2c = p.I2C2.i2c(sda, scl, 400.khz(), &mut rcc);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
