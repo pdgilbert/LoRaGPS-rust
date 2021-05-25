@@ -478,7 +478,7 @@ dependencies = [
  "panic-halt",
  "panic-reset",
  "panic-semihosting",
- "radio",
+ "radio 0.9.0",
  "radio-sx127x",
  "shared-bus",
  "ssd1306",
@@ -655,6 +655,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "radio"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c5b2be51c82da34d592a00dbb008f651a30a4162668647482adaeef6453055de"
+dependencies = [
+ "chrono",
+ "embedded-hal 1.0.0-alpha.4",
+ "log",
+ "nb 1.0.0",
+]
+
+[[package]]
 name = "radio-sx127x"
 version = "0.10.1"
 source = "git+https://github.com/pdgilbert/rust-radio-sx127x#27d56e16bf5c0b557143c06273ac6176ed720695"
@@ -666,7 +678,7 @@ dependencies = [
  "embedded-spi",
  "libc",
  "log",
- "radio",
+ "radio 0.8.1",
  "void",
 ]
 
