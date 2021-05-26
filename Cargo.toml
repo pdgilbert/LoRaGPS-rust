@@ -49,13 +49,18 @@ embedded-spi = { version = "0.6", default-features = false }
 # for radio-sx127x which uses embedded-hal 1.0.0-alpha while device crates still use 0.2.4
 embedded-hal = { version = "1.0.0-alpha.4" }
 old-e-h      = { version = "0.2.4", package = "embedded-hal" }
-embedded-hal-compat = "0.1.3" 
 
 #radio         = {  git = "https://github.com/rust-iot/radio-hal", default-features = false }
-#radio         = { version = "0.7.0" }
-#radio         = { version = "0.9.0" }
-radio-sx127x  = {  git = "https://github.com/pdgilbert/rust-radio-sx127x", default-features = false }
-radio         = { version = "0.8.1" }
+
+embedded-hal-compat = "0.1.3" 
+
+#radio-sx127x  = {  git = "https://github.com/pdgilbert/rust-radio-sx127x", default-features = false }
+#radio         = { version = "0.8.1" }
+
+#radio-sx127x  = { version = "0.11.0", default-features = false }
+radio-sx127x  = {  git = "https://github.com/rust-iot/rust-radio-sx127x", default-features = false }
+radio         = { version = "0.9.0" }
+
 
 driver-pal    = { version = "0.8.0-alpha.3", default-features = false }
 

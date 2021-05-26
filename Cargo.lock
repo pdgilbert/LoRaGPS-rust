@@ -446,9 +446,9 @@ checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
 
 [[package]]
 name = "libc"
-version = "0.2.94"
+version = "0.2.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "18794a8ad5b29321f790b55d93dfba91e125cb1a9edbd4f8e3150acc771c1a5e"
+checksum = "789da6d93f1b866ffe175afc5322a4d76c038605a1c3319bb57b06967ca98a36"
 
 [[package]]
 name = "log"
@@ -644,9 +644,9 @@ checksum = "e2a38df5b15c8d5c7e8654189744d8e396bddc18ad48041a500ce52d6948941f"
 
 [[package]]
 name = "radio"
-version = "0.8.1"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "868ec1a556682b96e03f902d4d979704f30e153b7dc0762e6f39fbb3b7c59dc2"
+checksum = "c5b2be51c82da34d592a00dbb008f651a30a4162668647482adaeef6453055de"
 dependencies = [
  "chrono",
  "embedded-hal 1.0.0-alpha.4",
@@ -656,18 +656,15 @@ dependencies = [
 
 [[package]]
 name = "radio-sx127x"
-version = "0.10.1"
-source = "git+https://github.com/pdgilbert/rust-radio-sx127x#27d56e16bf5c0b557143c06273ac6176ed720695"
+version = "0.11.0"
+source = "git+https://github.com/rust-iot/rust-radio-sx127x#4736b42a52ae853b9f17892d5c1bb3a81ab77f07"
 dependencies = [
  "bitflags",
  "driver-pal",
- "embedded-hal 0.2.5",
  "embedded-hal 1.0.0-alpha.4",
- "embedded-spi",
  "libc",
  "log",
  "radio",
- "void",
 ]
 
 [[package]]
@@ -824,7 +821,7 @@ dependencies = [
 [[package]]
 name = "stm32f0xx-hal"
 version = "0.17.1"
-source = "git+https://github.com/stm32-rs/stm32f0xx-hal#8970b06de2463cd4d4ec14179dff2b12541751a7"
+source = "git+https://github.com/stm32-rs/stm32f0xx-hal#73b0fac9a4fe7147d35fabaf0a42f64b24a49c15"
 dependencies = [
  "bare-metal 1.0.0",
  "bxcan",
@@ -879,7 +876,7 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#dfb5df43a0907c28ce34d9488260608cdbc59bfb"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#dac205ea23502a8a038a438c4b8da2576958daa9"
 dependencies = [
  "cargo_metadata",
  "cfg-if",
@@ -893,7 +890,6 @@ dependencies = [
  "rtcc",
  "slice-group-by",
  "stm32f3",
- "typenum",
  "void",
 ]
 
