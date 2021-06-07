@@ -53,6 +53,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
+name = "az"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "822d7d63e0c0260a050f6b1f0d316f5c79b9eab830aca526ed904e1011bd64ca"
+
+[[package]]
 name = "bare-metal"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -322,6 +328,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "embedded-graphics"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b228f7adadb421006a649e15d42014fec240829621ae1969219fb820694b29a"
+dependencies = [
+ "az",
+ "byteorder",
+ "embedded-graphics-core",
+ "float-cmp",
+ "micromath",
+]
+
+[[package]]
+name = "embedded-graphics-core"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e3902d8d4422aa9ac75556f8cfb2e02c8ba22eb3f1993aec8bc113e6299b2da"
+dependencies = [
+ "az",
+ "byteorder",
+]
+
+[[package]]
 name = "embedded-hal"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -367,6 +396,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f85ab0d224a6c70f11426a9f04d5f26d250605b80df8fbed197e49d4454f58d7"
 dependencies = [
  "num",
+]
+
+[[package]]
+name = "float-cmp"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1267f4ac4f343772758f7b1bdcbe767c218bbab93bb432acbf5162bbf85a6c4"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]
@@ -468,7 +506,7 @@ dependencies = [
  "cortex-m-rt",
  "cortex-m-semihosting",
  "driver-pal",
- "embedded-graphics",
+ "embedded-graphics 0.7.0",
  "embedded-hal 0.2.5",
  "embedded-hal 1.0.0-alpha.4",
  "embedded-hal-compat",
@@ -795,7 +833,7 @@ dependencies = [
  "display-interface",
  "display-interface-i2c",
  "display-interface-spi",
- "embedded-graphics",
+ "embedded-graphics 0.6.2",
  "embedded-hal 0.2.5",
  "generic-array 0.14.4",
 ]
