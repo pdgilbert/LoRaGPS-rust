@@ -31,7 +31,7 @@ use ads1x1x::{channel as AdcChannel, Ads1x1x, FullScaleRange, SlaveAddr};
 
 use core::fmt::Write;
 use embedded_graphics::{
-    mono_font::{ascii::FONT_8X13, MonoTextStyleBuilder, MonoTextStyle},   //FONT_6X10
+    mono_font::{ascii::FONT_8X13, MonoTextStyle, MonoTextStyleBuilder}, //FONT_6X10
     pixelcolor::BinaryColor,
     prelude::*,
     text::{Baseline, Text},
@@ -103,13 +103,18 @@ fn main() -> ! {
     disp.init().unwrap();
 
     let text_style = MonoTextStyleBuilder::new()
-        .font(&FONT_8X13)   //.font(&FONT_6X10)
+        .font(&FONT_8X13) //.font(&FONT_6X10)
         .text_color(BinaryColor::On)
         .build();
 
-    Text::with_baseline("Display initialized ...", Point::zero(), text_style, Baseline::Top)
-        .draw(&mut disp)
-        .unwrap();
+    Text::with_baseline(
+        "Display initialized ...",
+        Point::zero(),
+        text_style,
+        Baseline::Top,
+    )
+    .draw(&mut disp)
+    .unwrap();
 
     //let interface = I2CDIBuilder::new().init(manager.acquire());
 
@@ -118,12 +123,12 @@ fn main() -> ! {
     //    .size(DisplaySize128x64)
     //    .connect(interface)
     //    .into();
-   // disp.init().unwrap();
-//
+    // disp.init().unwrap();
+    //
     //let text_style = TextStyleBuilder::new(Font8x16)
     //    .text_color(BinaryColor::On)
     //    .build();
-//
+    //
     //Text::new("Display initialized ...", Point::zero())
     //    .into_styled(text_style)
     //    .draw(&mut disp)
