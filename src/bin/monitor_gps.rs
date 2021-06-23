@@ -38,6 +38,7 @@ use embedded_graphics::{
 };
 
 //use ssd1306::{mode::GraphicsMode, prelude::*, Builder, I2CDIBuilder};
+//use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306, mode::GraphicsMode};
 use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306};
 
 use lora_gps::lora_spi_gps_usart::{setup, LED};
@@ -49,6 +50,7 @@ fn display(
     temp_c: i16,
     values_b: [i16; 3],
     disp: &mut impl DrawTarget<Color = BinaryColor>,
+    //disp: &mut GraphicsMode<impl WriteOnlyDataCommand, impl DisplaySize>,
     //disp : impl DrawTarget<BinaryColor> + WriteOnlyDataCommand,
     //disp : impl DrawTarget<BinaryColor> + cortex_m::prelude::_embedded_hal_serial_Write,
     text_style: MonoTextStyle<BinaryColor>,
@@ -115,24 +117,6 @@ fn main() -> ! {
     )
     .draw(&mut disp)
     .unwrap();
-
-    //let interface = I2CDIBuilder::new().init(manager.acquire());
-
-    // set display size 128x32 or 128x64 and Font6x8 or Font8x16
-    //let mut disp: GraphicsMode<_, _> = Builder::new()
-    //    .size(DisplaySize128x64)
-    //    .connect(interface)
-    //    .into();
-    // disp.init().unwrap();
-    //
-    //let text_style = TextStyleBuilder::new(Font8x16)
-    //    .text_color(BinaryColor::On)
-    //    .build();
-    //
-    //Text::new("Display initialized ...", Point::zero())
-    //    .into_styled(text_style)
-    //    .draw(&mut disp)
-    //    .unwrap();
 
     disp.flush().unwrap();
 
