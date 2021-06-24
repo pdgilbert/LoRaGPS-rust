@@ -320,9 +320,9 @@ dependencies = [
 
 [[package]]
 name = "embedded-graphics"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b228f7adadb421006a649e15d42014fec240829621ae1969219fb820694b29a"
+checksum = "750082c65094fbcc4baf9ba31583ce9a8bb7f52cadfb96f6164b1bc7f922f32b"
 dependencies = [
  "az",
  "byteorder",
@@ -475,9 +475,9 @@ checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
 
 [[package]]
 name = "libc"
-version = "0.2.95"
+version = "0.2.97"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "789da6d93f1b866ffe175afc5322a4d76c038605a1c3319bb57b06967ca98a36"
+checksum = "12b8adadd720df158f4d70dfe7ccc6adb0472d7c55ca83445f6a5ab3e36f8fb6"
 
 [[package]]
 name = "log"
@@ -698,9 +698,9 @@ dependencies = [
 
 [[package]]
 name = "rand_core"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34cf66eb183df1c5876e2dcf6b13d57340741e8dc255b48e40a26de954d06ae7"
+checksum = "d34f1408f55294453790c48b2f1ebbb1c5b4b7563eb1f418bcfcfdbb06ebb4e7"
 
 [[package]]
 name = "rtcc"
@@ -905,8 +905,8 @@ dependencies = [
 
 [[package]]
 name = "stm32f3xx-hal"
-version = "0.6.1"
-source = "git+https://github.com/stm32-rs/stm32f3xx-hal#2a4382e82c9df1470d58f1f3aefd98be38a5c9cb"
+version = "0.7.0"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#90ed60bac72d75aa51f99ba5d725eff9e6ef2793"
 dependencies = [
  "cargo_metadata",
  "cfg-if",
@@ -938,7 +938,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.9.0"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#dabb3728a2dae99786a5934f3ae85ae38ad5d773"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#d4cc782a270fcc63d088b8576f6967b4eca555dd"
 dependencies = [
  "bare-metal 1.0.0",
  "cast",
@@ -968,7 +968,7 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.3.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#af93075e9cc0c8c1f104fe4cbbfd3816f42053a3"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#3986d2e50fd541663cbab8a3874862fc8baa5a0f"
 dependencies = [
  "as-slice",
  "bare-metal 0.2.5",
@@ -1029,7 +1029,7 @@ dependencies = [
 [[package]]
 name = "stm32l0xx-hal"
 version = "0.7.0"
-source = "git+https://github.com/stm32-rs/stm32l0xx-hal#1324d0991d700a4363eaa84f9b7f65258a31cb51"
+source = "git+https://github.com/stm32-rs/stm32l0xx-hal#caf8989a596dabc021ee3bf79f53de9a81b9df3e"
 dependencies = [
  "as-slice",
  "cast",
@@ -1083,11 +1083,12 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#ceb1a292c91ff06612bf49a496e437d1d99649fe"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#9cba0fbe98cff27418459a7589f45b6153d52987"
 dependencies = [
  "bxcan",
  "cast",
  "cortex-m 0.6.7",
+ "embedded-dma",
  "embedded-hal 0.2.5",
  "nb 0.1.3",
  "rand_core",
@@ -1098,9 +1099,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.72"
+version = "1.0.73"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1e8cdbefb79a9a5a65e0db8b47b723ee907b7c7f8496c76a1770b5c310bab82"
+checksum = "f71489ff30030d2ae598524f61326b902466f72a0fb1a8564c001cc63425bcc7"
 dependencies = [
  "proc-macro2",
  "quote",

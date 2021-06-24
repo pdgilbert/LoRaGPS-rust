@@ -37,24 +37,20 @@ use embedded_graphics::{
     text::{Baseline, Text},
 };
 
-//use ssd1306::{mode::GraphicsMode, prelude::*, Builder, I2CDIBuilder};
-//use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306, mode::GraphicsMode};
-use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306};
+use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306, mode::BufferedGraphicsMode};
 
 use lora_gps::lora_spi_gps_usart::{setup, LED};
 
-fn display(
+fn display<S>(
     bat_mv: i16,
     bat_ma: i16,
     load_ma: i16,
     temp_c: i16,
     values_b: [i16; 3],
-    disp: &mut impl DrawTarget<Color = BinaryColor>,
-    //disp: &mut GraphicsMode<impl WriteOnlyDataCommand, impl DisplaySize>,
-    //disp : impl DrawTarget<BinaryColor> + WriteOnlyDataCommand,
-    //disp : impl DrawTarget<BinaryColor> + cortex_m::prelude::_embedded_hal_serial_Write,
     text_style: MonoTextStyle<BinaryColor>,
-) -> () {
+    disp: &mut Ssd1306<impl WriteOnlyDataCommand, S, BufferedGraphicsMode<S>>) -> ()
+            where S: DisplaySize,
+{
     let mut lines: [String<32>; 4] = [
         heapless::String::new(),
         heapless::String::new(),
@@ -62,25 +58,16 @@ fn display(
         heapless::String::new(),
     ];
 
-    write!(lines[0], "bat:{:4}mV{:4}mA", bat_mv, bat_ma).unwrap();
-    write!(lines[1], "load:    {:5}mA", load_ma).unwrap();
-    write!(
-        lines[2],
-        "B:{:4} {:4} {:4}",
-        values_b[0], values_b[1], values_b[2]
-    )
-    .unwrap();
-    write!(lines[3], "temperature{:3} C", temp_c).unwrap();
+    write!(lines[0], "bat:{:4}mV{:4}mA",   bat_mv,  bat_ma                    ).unwrap();
+    write!(lines[1], "load:    {:5}mA",             load_ma                   ).unwrap();
+    write!(lines[2], "B:{:4} {:4} {:4}", values_b[0], values_b[1], values_b[2]).unwrap();
+    write!(lines[3], "temperature{:3} C",    temp_c                           ).unwrap();
 
-    let _z = disp.clear(BinaryColor::Off);
-    // check for err variant
-    for i in 0..lines.len() {
-        let _z = Text::new(&lines[i], Point::new(0, i as i32 * 16), text_style)
-            //.into_styled(text_style)
-            .draw(&mut *disp);
-        // check for err variant
+    disp.clear(); 
+    for i in 0..lines.len() {   // shift down by 10 so first line is on display
+        Text::new(&lines[i], Point::new(0, i as i32 * 16 + 10), text_style).draw(&mut *disp).unwrap();
     }
-    //disp.flush().unwrap();
+    disp.flush().unwrap();
     ()
 }
 
@@ -288,10 +275,7 @@ fn main() -> ! {
 
                 //    let (bat_mv, bat_ma, load_ma, temp_c, values_b) = read_adc(adc_a, adc_b);
 
-                display(
-                    bat_mv, bat_ma, load_ma, temp_c, values_b, &mut disp, text_style,
-                );
-                disp.flush().unwrap();
+                display(bat_mv, bat_ma, load_ma, temp_c, values_b, text_style, &mut disp);
 
                 buffer.clear();
                 good = false;
