@@ -22,6 +22,7 @@ See [repo eg_stm_hal](https://github.com/pdgilbert/eg_stm_hal) for examples of o
 | send_spi    | transmit a character string over LoRa,  + semihost output  |
 | receive_spi | receive  a character string over LoRa,  + semihost output  |
 | send_gps    | read gps and transmit over LoRa,  + semihost output        |
+| monitor_gps | read gps and transmit over LoRa,  + display on oled        |
 
 
 ## Building
@@ -91,6 +92,7 @@ Build and load in a separate window with one of
 cargo  run --target $TARGET --features $HAL,$MCU  --bin  receive_spi   [ --release ]
 SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  send_spi   [ --release ]
 SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin  send_gps   [ --release ]
+SENDER_ID="whatever"  cargo  run --target $TARGET --features $HAL,$MCU  --bin monitor_gps [ --release ]
 
 ```
 

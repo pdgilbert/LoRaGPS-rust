@@ -407,7 +407,7 @@ pub fn setup() -> (
     )
     .unwrap(); // should handle error
 
-    let (tx, rx) = Serial::usart2(
+    let (tx, rx) = Serial::new(
         p.USART2,
         (
             gpioa

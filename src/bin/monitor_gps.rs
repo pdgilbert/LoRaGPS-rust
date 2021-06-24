@@ -37,7 +37,7 @@ use embedded_graphics::{
     text::{Baseline, Text},
 };
 
-use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306, mode::BufferedGraphicsMode};
+use ssd1306::{mode::BufferedGraphicsMode, prelude::*, I2CDisplayInterface, Ssd1306};
 
 use lora_gps::lora_spi_gps_usart::{setup, LED};
 
@@ -48,8 +48,10 @@ fn display<S>(
     temp_c: i16,
     values_b: [i16; 3],
     text_style: MonoTextStyle<BinaryColor>,
-    disp: &mut Ssd1306<impl WriteOnlyDataCommand, S, BufferedGraphicsMode<S>>) -> ()
-            where S: DisplaySize,
+    disp: &mut Ssd1306<impl WriteOnlyDataCommand, S, BufferedGraphicsMode<S>>,
+) -> ()
+where
+    S: DisplaySize,
 {
     let mut lines: [String<32>; 4] = [
         heapless::String::new(),
@@ -58,14 +60,22 @@ fn display<S>(
         heapless::String::new(),
     ];
 
-    write!(lines[0], "bat:{:4}mV{:4}mA",   bat_mv,  bat_ma                    ).unwrap();
-    write!(lines[1], "load:    {:5}mA",             load_ma                   ).unwrap();
-    write!(lines[2], "B:{:4} {:4} {:4}", values_b[0], values_b[1], values_b[2]).unwrap();
-    write!(lines[3], "temperature{:3} C",    temp_c                           ).unwrap();
+    write!(lines[0], "bat:{:4}mV{:4}mA", bat_mv, bat_ma).unwrap();
+    write!(lines[1], "load:    {:5}mA", load_ma).unwrap();
+    write!(
+        lines[2],
+        "B:{:4} {:4} {:4}",
+        values_b[0], values_b[1], values_b[2]
+    )
+    .unwrap();
+    write!(lines[3], "temperature{:3} C", temp_c).unwrap();
 
-    disp.clear(); 
-    for i in 0..lines.len() {   // shift down by 10 so first line is on display
-        Text::new(&lines[i], Point::new(0, i as i32 * 16 + 10), text_style).draw(&mut *disp).unwrap();
+    disp.clear();
+    for i in 0..lines.len() {
+        // shift down by 10 so first line is on display
+        Text::new(&lines[i], Point::new(0, i as i32 * 16 + 10), text_style)
+            .draw(&mut *disp)
+            .unwrap();
     }
     disp.flush().unwrap();
     ()
@@ -275,7 +285,9 @@ fn main() -> ! {
 
                 //    let (bat_mv, bat_ma, load_ma, temp_c, values_b) = read_adc(adc_a, adc_b);
 
-                display(bat_mv, bat_ma, load_ma, temp_c, values_b, text_style, &mut disp);
+                display(
+                    bat_mv, bat_ma, load_ma, temp_c, values_b, text_style, &mut disp,
+                );
 
                 buffer.clear();
                 good = false;
