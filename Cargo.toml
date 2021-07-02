@@ -38,13 +38,13 @@ cortex-m-rt          = { version = ">=0.6.8" }
 panic-reset          = { version = ">=0.1.0" }
 panic-halt           = { version = ">=0.2.0" }
 
-ads1x1x =  { version = "0.2.1"}
+ads1x1x =  { version = ">=0.2.1"}
 ssd1306   = { version = ">=0.6.0"}
 #ssd1306   = { git = "https://github.com/jamwaffles/ssd1306"  }  
 embedded-graphics   = { version = ">=0.7.0" }                 
-shared-bus = { version = "0.1.4", features = ["cortexm"] }
+shared-bus = { version = ">=0.1.4", features = ["cortexm"] }
 
-embedded-spi = { version = "0.6", default-features = false }
+embedded-spi = { version = ">=0.6", default-features = false }
 
 # for radio-sx127x which uses embedded-hal 1.0.0-alpha while device crates still use 0.2.4
 embedded-hal = { version = "1.0.0-alpha.4" }
