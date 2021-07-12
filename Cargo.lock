@@ -827,16 +827,15 @@ checksum = "1f7474f0b646d228360ab62ed974744617bc869d959eac8403bfa3665931a7fb"
 
 [[package]]
 name = "ssd1306"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32dfc9d17ad1c006fbcd9150b92573a3801b079de234760e545f60981a56f691"
+checksum = "a1fe1e39676a72e07a9592c8a30a008e58746b47e872c81ca909b1c2f992001b"
 dependencies = [
  "display-interface",
  "display-interface-i2c",
  "display-interface-spi",
  "embedded-graphics-core",
  "embedded-hal 0.2.5",
- "generic-array 0.14.4",
 ]
 
 [[package]]
