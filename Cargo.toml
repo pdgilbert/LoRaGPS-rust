@@ -39,7 +39,7 @@ nb                   = { version = ">=0.1.2" }
 #error: failed to load bc of "cortex_m_rt-f826bb109239e9a9.cortex_m_rt.2itra1ai-cgu.0.rcgu.o": 
 # until device crates also update.
 # see https://github.com/rust-embedded/cortex-m/issues/310
-cortex-m-rt          = { version = "^0.6.8" }
+cortex-m-rt          = { version = "^0.7.0" }
 panic-reset          = { version = ">=0.1.0" }
 panic-halt           = { version = ">=0.2.0" }
 
