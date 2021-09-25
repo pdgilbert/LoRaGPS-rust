@@ -100,7 +100,7 @@ jobs:
         uses: actions-rs/cargo@v1 
         with:
           command: tree
-          args:  -i -p embedded-hal:0.2.5
+          args:  -i -p embedded-hal:0.2.6
 
       - name: tree e-h 1.0.0-alpha.4
         uses: actions-rs/cargo@v1 
