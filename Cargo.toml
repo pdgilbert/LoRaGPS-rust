@@ -52,7 +52,7 @@ shared-bus = { version = ">=0.1.4", features = ["cortexm"] }
 embedded-spi = { version = ">=0.6", default-features = false }
 
 # for radio-sx127x which uses embedded-hal 1.0.0-alpha while device crates still use 0.2.4
-embedded-hal = { version = "1.0.0-alpha.4, <1.0.0-alpha.5" }
+embedded-hal = { version = "1.0.0-alpha.5" }
 #embedded-hal = { version = "1.0.0-alpha.5" }  
 old-e-h      = { version = "0.2.6", package = "embedded-hal" }
 
