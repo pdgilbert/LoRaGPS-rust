@@ -428,9 +428,9 @@ dependencies = [
 
 [[package]]
 name = "embedded-hal-compat"
-version = "0.1.3"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2afb504e8ae78ede52799ea060abb3836fe2f7a24e8ac1cacb9086c5cfcabf7"
+checksum = "756b5ffb78a411a91ac281c9094b3520f53935557143aa5448c9d6b845ebad1c"
 dependencies = [
  "embedded-hal 0.2.6",
  "embedded-hal 1.0.0-alpha.4",
@@ -1079,7 +1079,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da3d56009c8f32e4f208dbea17df72484154d1040a8969b75d8c73eb7b18fe8f"
 dependencies = [
  "bare-metal 0.2.5",
- "cortex-m 0.5.11",
+ "cortex-m 0.7.3",
  "cortex-m-rt 0.6.14",
  "vcell",
 ]
