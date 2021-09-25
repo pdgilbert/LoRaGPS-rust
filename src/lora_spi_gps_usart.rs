@@ -214,8 +214,8 @@ use stm32f1xx_hal::{
     spi::{Error, Spi},
 };
 
-#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
-use old_e_h::digital::v2::OutputPin;
+//#[cfg(feature = "stm32f1xx")] //  eg blue pill stm32f103
+//use old_e_h::digital::v2::OutputPin;
 
 #[cfg(feature = "stm32f1xx")]
 pub fn setup() -> (
@@ -230,17 +230,17 @@ pub fn setup() -> (
     let cp = CorePeripherals::take().unwrap();
     let p = Peripherals::take().unwrap();
 
-    let mut rcc = p.RCC.constrain();
+    let rcc = p.RCC.constrain();
     let clocks = rcc
         .cfgr
         .sysclk(64.mhz())
         .pclk1(32.mhz())
         .freeze(&mut p.FLASH.constrain().acr);
 
-    let mut afio = p.AFIO.constrain(&mut rcc.apb2);
-    let mut gpioa = p.GPIOA.split(&mut rcc.apb2);
-    let mut gpiob = p.GPIOB.split(&mut rcc.apb2);
-    let mut gpioc = p.GPIOC.split(&mut rcc.apb2);
+    let mut afio = p.AFIO.constrain();
+    let mut gpioa = p.GPIOA.split();
+    let mut gpiob = p.GPIOB.split();
+    let mut gpioc = p.GPIOC.split();
 
     let spi = Spi::spi1(
         p.SPI1,
@@ -253,7 +253,6 @@ pub fn setup() -> (
         MODE,
         8.mhz(),
         clocks,
-        &mut rcc.apb2,
     );
 
     let delay = Delay::new(cp.SYST, clocks);
@@ -280,7 +279,6 @@ pub fn setup() -> (
         &mut afio.mapr,
         Config::default().baudrate(9_600.bps()),
         clocks,
-        &mut rcc.apb1,
     )
     .split();
 
@@ -296,7 +294,6 @@ pub fn setup() -> (
             duty_cycle: DutyCycle::Ratio2to1,
         },
         clocks,
-        &mut rcc.apb1,
         1000,
         10,
         1000,
@@ -314,10 +311,10 @@ pub fn setup() -> (
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_low().unwrap()
+            self.set_low()
         }
         fn off(&mut self) -> () {
-            self.set_high().unwrap()
+            self.set_high()
         }
     }
 
@@ -333,7 +330,7 @@ use stm32f3xx_hal::{
     i2c::{I2c, SclPin, SdaPin},
     pac::{CorePeripherals, Peripherals, I2C2, USART2},
     prelude::*,
-    serial::{Rx, Serial, Tx},
+    serial::{Serial, Rx, RxPin, Tx, TxPin},
     spi::{Error, Spi},
 };
 
@@ -342,8 +339,8 @@ pub fn setup() -> (
     impl DelayMs<u32>
         + Transmit<Error = sx127xError<Error, Infallible, Infallible>>
         + Receive<Info = PacketInfo, Error = sx127xError<Error, Infallible, Infallible>>,
-    Tx<USART2>,
-    Rx<USART2>,
+    Tx<USART2, impl TxPin<USART2>>,
+    Rx<USART2, impl RxPin<USART2>>,
     I2c<I2C2, (impl SclPin<I2C2>, impl SdaPin<I2C2>)>,
     PE15<Output<PushPull>>,
 ) {
@@ -361,7 +358,7 @@ pub fn setup() -> (
     let mut gpiob = p.GPIOB.split(&mut rcc.ahb);
     let mut gpioe = p.GPIOE.split(&mut rcc.ahb);
 
-    let spi = Spi::spi1(
+    let spi = Spi::new(
         p.SPI1,
         (
             gpioa
@@ -374,7 +371,6 @@ pub fn setup() -> (
                 .pa7
                 .into_af5_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // mosi  on PA7
         ),
-        MODE,
         8_000_000.Hz(),
         clocks,
         &mut rcc.apb2,
@@ -494,19 +490,19 @@ pub fn setup() -> (
     let gpiob = p.GPIOB.split();
     let gpioc = p.GPIOC.split();
 
-    let spi = Spi::spi1(
+    let spi = Spi::new(
         p.SPI1,
         (
-            gpioa.pa5.into_alternate_af5(), // sck   on PA5
-            gpioa.pa6.into_alternate_af5(), // miso  on PA6
-            gpioa.pa7.into_alternate_af5(), // mosi  on PA7
+            gpioa.pa5.into_alternate(), // sck   on PA5
+            gpioa.pa6.into_alternate(), // miso  on PA6
+            gpioa.pa7.into_alternate(), // mosi  on PA7
         ),
         MODE,
-        MegaHertz(8).into(),
+        MegaHertz(8),
         clocks,
     );
 
-    let delay = Delay::new(cp.SYST, clocks);
+    let delay = Delay::new(cp.SYST, &clocks);
 
     // Create lora radio instance
 
@@ -531,11 +527,11 @@ pub fn setup() -> (
 
     //lora.lora_configure( config_lora, &config_ch ).unwrap(); # not yet pub, to change something
 
-    let (tx, rx) = Serial::usart2(
+    let (tx, rx) = Serial::new(
         p.USART2,
         (
-            gpioa.pa2.into_alternate_af7(), //tx pa2  for GPS rx
-            gpioa.pa3.into_alternate_af7(), //rx pa3  for GPS tx
+            gpioa.pa2.into_alternate(), //tx pa2  for GPS rx
+            gpioa.pa3.into_alternate(), //rx pa3  for GPS tx
         ),
         Config::default().baudrate(9600.bps()),
         clocks,
@@ -543,8 +539,8 @@ pub fn setup() -> (
     .unwrap()
     .split();
 
-    let scl = gpiob.pb10.into_alternate_af4().set_open_drain(); // scl on PB10
-    let sda = gpiob.pb3.into_alternate_af9().set_open_drain(); // sda on PB3
+    let scl = gpiob.pb10.into_alternate().set_open_drain(); // scl on PB10
+    let sda = gpiob.pb3.into_alternate().set_open_drain(); // sda on PB3
 
     let i2c = I2c::new(p.I2C2, (scl, sda), 400.khz(), clocks);
 
@@ -552,10 +548,10 @@ pub fn setup() -> (
     // differently. Next will be reversed for nucleo-64 (in addition to PA5 vs PC13).
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
-            self.set_low().unwrap()
+            self.set_low()
         }
         fn off(&mut self) -> () {
-            self.set_high().unwrap()
+            self.set_high()
         }
     }
 
@@ -604,7 +600,7 @@ pub fn setup() -> (
         Spi::new(p.SPI1, (sck, miso, mosi)).enable::<u8>(&mut rcc.apb2, ClockDivider::DIV32, MODE);
 
     //let clocks = rcc.cfgr.sysclk(216.mhz()).freeze();
-    let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+    let clocks = rcc.cfgr.sysclk(64.MHz()).pclk1(32.MHz()).freeze();
 
     let delay = Delay::new(cp.SYST, clocks);
 
@@ -630,7 +626,7 @@ pub fn setup() -> (
         ),
         clocks,
         Config {
-            baud_rate: 9600.bps(),
+            baud_rate: 9600.Bps(),
             oversampling: Oversampling::By16,
             character_match: None,
         },
@@ -643,7 +639,7 @@ pub fn setup() -> (
     let i2c = BlockingI2c::i2c2(
         p.I2C2,
         (scl, sda),
-        stm32f7xx_hal::i2c::Mode::standard(400_000.hz()),
+        stm32f7xx_hal::i2c::Mode::standard(400_000.Hz()),
         clocks,
         &mut rcc.apb1,
         1000,
@@ -800,7 +796,7 @@ pub fn setup() -> (
             gpioa.pa7, // mosi  on PA7
         ),
         MODE,
-        8.mhz(),
+        8_000_000.Hz(),
         &mut rcc,
     );
 
@@ -824,7 +820,7 @@ pub fn setup() -> (
         .usart(
             gpioa.pa2, //tx pa2  for GPS
             gpioa.pa3, //rx pa3  for GPS
-            Config::default().baudrate(9600.bps()),
+            Config::default().baudrate(9600.Bd()),
             &mut rcc,
         )
         .unwrap()
@@ -833,7 +829,7 @@ pub fn setup() -> (
     let scl = gpiob.pb10.into_open_drain_output();
     let sda = gpiob.pb11.into_open_drain_output();
 
-    let i2c = p.I2C2.i2c(sda, scl, 400.khz(), &mut rcc);
+    let i2c = p.I2C2.i2c(sda, scl, 400_000.Hz(), &mut rcc);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
@@ -943,7 +939,7 @@ pub fn setup() -> (
 use stm32l4xx_hal::{
     delay::Delay,
     gpio::{gpioc::PC13, Output, PushPull},
-    i2c::{I2c, SclPin, SdaPin},
+    i2c::{I2c, SclPin, SdaPin, Config as i2cConfig},
     pac::{CorePeripherals, Peripherals, I2C1, USART2},
     prelude::*,
     serial::{Config, Rx, Serial, Tx},
@@ -1040,7 +1036,7 @@ pub fn setup() -> (
     sda.internal_pull_up(&mut gpioa.pupdr, true);
     let sda = sda.into_af4(&mut gpioa.moder, &mut gpioa.afrh);
 
-    let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1);
+    let i2c = I2c::i2c1(p.I2C1, (scl, sda), i2cConfig::new(400.khz(), clocks), &mut rcc.apb1r1);
 
     impl LED for PC13<Output<PushPull>> {
         fn on(&mut self) -> () {
