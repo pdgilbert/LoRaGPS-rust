@@ -575,9 +575,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.102"
+version = "0.2.103"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2a5ac8f984bfcf3a823267e5fde638acc3325f6496633a5da6bb6eb2171e103"
+checksum = "dd8f7255a17a627354f321ef0055d63b898c6fb27eff628af4d1b66b7331edf6"
 
 [[package]]
 name = "lock_api"
@@ -1150,7 +1150,7 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.10.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#4f5f7548f4bc2f02709fc83f229b91709354d47e"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#7e6652e2e8981739ed4c169c78cee200a91aea77"
 dependencies = [
  "bare-metal 1.0.0",
  "cast 0.2.7",
@@ -1234,7 +1234,7 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#630f95743e5acf9dc9a99e7c61c53ae1c615fb79"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#84389a540bb9b51db6f24603c2b4d3fbaac29540"
 dependencies = [
  "bxcan",
  "cast 0.2.7",
