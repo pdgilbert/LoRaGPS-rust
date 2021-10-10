@@ -14,7 +14,7 @@ use panic_halt as _;
 
 use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
-use embedded_hal::blocking::delay::DelayMs;
+use embedded_hal::delay::blocking::DelayMs;
 use radio::Transmit;
 
 use heapless::Vec;
@@ -101,9 +101,9 @@ fn main() -> ! {
                     //hprintln!("{:?}", &buf2).unwrap();
                     hprint!(".").unwrap(); // print "."  on transmit of $GPRMC message (but not others)
                     led.on(); // double blink on transmit of decoded message, one here and one below.
-                    let _ = lora.try_delay_ms(2u32);
+                    let _ = lora.delay_ms(2u32);
                     led.off();
-                    let _ = lora.try_delay_ms(300u32);
+                    let _ = lora.delay_ms(300u32);
                 } else {
                     for v in buffer[..].iter() {
                         buf2.push(*v).unwrap();
@@ -113,7 +113,7 @@ fn main() -> ! {
                 match lora.start_transmit(&buf2) {
                     Ok(_b) => {
                         led.on();
-                        let _ = lora.try_delay_ms(2u32);
+                        let _ = lora.delay_ms(2u32);
                         led.off();
                     }
                     Err(_err) => {
@@ -145,7 +145,7 @@ fn main() -> ! {
 
                 buffer.clear();
                 good = false;
-                match lora.try_delay_ms(5000u32) {
+                match lora.delay_ms(5000u32) {
                     Ok(b) => b, // b is ()
                     Err(_err) => {
                         hprintln!("Error returned from lora.try_delay_ms().").unwrap();

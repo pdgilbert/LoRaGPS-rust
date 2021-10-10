@@ -16,7 +16,7 @@ use panic_halt as _;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
 
-use embedded_hal::blocking::delay::DelayMs;
+use embedded_hal::delay::blocking::DelayMs;
 
 // trait needs to be in scope to find  methods start_transmit and check_transmit.
 use radio::Receive;
@@ -56,7 +56,7 @@ fn main() -> ! {
                 // for some reason the next prints twice?
                 hprintln!("{}", to_str(&buff[..n])).unwrap();
                 led.on();
-                let _ = lora.try_delay_ms(20u32);
+                let _ = lora.delay_ms(20u32);
                 led.off();
             }
 
@@ -65,7 +65,7 @@ fn main() -> ! {
             Err(err) => hprintln!("poll error {:?} ", err).unwrap(),
         };
 
-        match lora.try_delay_ms(100u32) {
+        match lora.delay_ms(100u32) {
             Ok(b) => b, // b is ()
             Err(_err) => {
                 hprintln!("Error returned from lora.try_delay_ms().").unwrap();

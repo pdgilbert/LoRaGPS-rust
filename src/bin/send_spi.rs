@@ -15,7 +15,7 @@ use panic_halt as _;
 
 use cortex_m_rt::entry;
 use cortex_m_semihosting::*;
-use embedded_hal::blocking::delay::DelayMs;
+use embedded_hal::delay::blocking::DelayMs;
 
 use radio::Transmit;
 
@@ -71,7 +71,7 @@ fn main() -> ! {
         match lora.start_transmit(message) {
             Ok(_b) => {
                 led.on();
-                let _ = lora.try_delay_ms(2u32); // very short
+                let _ = lora.delay_ms(2u32); // very short
                 led.off();
             }
             Err(_err) => {
@@ -94,7 +94,7 @@ fn main() -> ! {
             }
         };
 
-        match lora.try_delay_ms(5000u32) {
+        match lora.delay_ms(5000u32) {
             Ok(b) => b, // b is ()
             Err(_err) => {
                 hprintln!("Error returned from lora.try_delay_ms().").unwrap();
