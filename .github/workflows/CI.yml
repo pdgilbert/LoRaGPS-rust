@@ -106,7 +106,7 @@ jobs:
         uses: actions-rs/cargo@v1 
         with:
           command: tree
-          args:  -i -p embedded-hal:1.0.0-alpha.4
+          args:  -i -p embedded-hal:1.0.0-alpha.5
 
       - name: Build
         uses: actions-rs/cargo@v1 
