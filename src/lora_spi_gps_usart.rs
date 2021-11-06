@@ -976,15 +976,21 @@ pub fn setup() -> (
     let spi = Spi::spi1(
         p.SPI1,
         (
-            gpioa
-                .pa5
-                .into_alternate_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // sck   on PA5
-            gpioa
-                .pa6
-                .into_alternate_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // miso  on PA6
-            gpioa
-                .pa7
-                .into_alternate_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), // mosi  on PA7
+            gpioa.pa5.into_alternate_push_pull(
+                &mut gpioa.moder,
+                &mut gpioa.otyper,
+                &mut gpioa.afrl,
+            ), // sck   on PA5
+            gpioa.pa6.into_alternate_push_pull(
+                &mut gpioa.moder,
+                &mut gpioa.otyper,
+                &mut gpioa.afrl,
+            ), // miso  on PA6
+            gpioa.pa7.into_alternate_push_pull(
+                &mut gpioa.moder,
+                &mut gpioa.otyper,
+                &mut gpioa.afrl,
+            ), // mosi  on PA7
         ),
         MODE,
         8.mhz(),
@@ -1022,12 +1028,16 @@ pub fn setup() -> (
     let (tx, rx) = Serial::usart2(
         p.USART2,
         (
-            gpioa
-                .pa2
-                .into_alternate_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), //tx pa2  for GPS
-            gpioa
-                .pa3
-                .into_alternate_push_pull(&mut gpioa.moder, &mut gpioa.otyper, &mut gpioa.afrl), //rx pa3  for GPS
+            gpioa.pa2.into_alternate_push_pull(
+                &mut gpioa.moder,
+                &mut gpioa.otyper,
+                &mut gpioa.afrl,
+            ), //tx pa2  for GPS
+            gpioa.pa3.into_alternate_push_pull(
+                &mut gpioa.moder,
+                &mut gpioa.otyper,
+                &mut gpioa.afrl,
+            ), //rx pa3  for GPS
         ),
         Config::default().baudrate(9600.bps()),
         clocks,

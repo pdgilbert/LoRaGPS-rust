@@ -1,0 +1,9 @@
+-more robust error handling around no gps signal.
+-add send_temp.
+-add display on receive.
+-add channel as compile line option
+-separate parse ( and send?) to a funstion
+-test other radios.
+
+-send as separate thread.
+-receive as separate thread.
