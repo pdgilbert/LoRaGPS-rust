@@ -1,6 +1,6 @@
 [package]
 name = "lora_gps"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Paul Gilbert <pdgilbert@users.noreply.github.com>"]
 edition = "2018"
 repository = "https://github.com/pdgilbert/LoRaGPS-rust"
@@ -31,15 +31,9 @@ path = "src/bin/send_gps.rs"
 #path = "examples/endTestCHxx.rs"
 
 [dependencies]
-#cortex-m            = { version = ">=0.7.1" }
-cortex-m             = { version = ">=0.6.4" }  #as of March 2021 needed for stm32h742,  stm32l0x2, stm32l4x2 but others need >=0.7.0
+cortex-m            = { version = ">=0.7.1" }
 nb                   = { version = ">=0.1.2" }
-# note that cortex-m-rt 0.7.0 causes link problem 
-# Linking globals named 'error: cortex-m-rt appears more than once in the dependency graph': symbol multiply defined!
-#error: failed to load bc of "cortex_m_rt-f826bb109239e9a9.cortex_m_rt.2itra1ai-cgu.0.rcgu.o": 
-# until device crates also update.
-# see https://github.com/rust-embedded/cortex-m/issues/310
-cortex-m-rt          = { version = "^0.6.8" }
+cortex-m-rt          = { version = "^0.7.0" }
 panic-reset          = { version = ">=0.1.0" }
 panic-halt           = { version = ">=0.2.0" }
 
@@ -51,25 +45,18 @@ shared-bus = { version = ">=0.1.4", features = ["cortexm"] }
 
 embedded-spi = { version = ">=0.6", default-features = false }
 
-# for radio-sx127x which uses embedded-hal 1.0.0-alpha while device crates still use 0.2.4
-#embedded-hal = { version = "1.0.0-alpha.4, <1.0.0-alpha.5" }
+# for radio-sx127x which uses embedded-hal 1.0.0-alpha while device crates still use 0.2.x
 embedded-hal = { version = "1.0.0-alpha.5" }  
 old-e-h      = { version = "0.2.6", package = "embedded-hal" }
 
-#radio         = {  git = "https://github.com/rust-iot/radio-hal", default-features = false }
-
-#embedded-hal-compat = "0.1.3" 
-#embedded-hal-compat = ">=0.1.3" 
 embedded-hal-compat = "0.4.0" 
 
 #radio-sx127x  = {  git = "https://github.com/pdgilbert/rust-radio-sx127x", default-features = false }
-#radio         = { version = "0.8.1" }
 
 #radio-sx127x  = { version = "0.11.0", default-features = false }
 radio-sx127x  = {  git = "https://github.com/rust-iot/rust-radio-sx127x", default-features = false }
-#radio         = { version = "0.9.0" }
 radio         = { version = "0.9.1" }
-#radio         = { git = "https://github.com/rust-iot/radio-hal" }
+#radio         = {  git = "https://github.com/rust-iot/radio-hal", default-features = false }
 
 
 #driver-pal   = { version = "0.8.0-alpha.3", default-features = false }
@@ -77,19 +64,19 @@ driver-pal   = { git = "https://github.com/ryankurte/rust-driver-pal/", default-
 
 stm32f0xx-hal = { git = "https://github.com/stm32-rs/stm32f0xx-hal", optional = true }
 stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
-stm32f3xx-hal = { git = "https://github.com/stm32-rs/stm32f3xx-hal", optional = true }
-#stm32f4xx-hal = { git = "https://github.com/stm32-rs/stm32f4xx-hal", optional = true } #conflict using newer version of cortex-m-rt
+#stm32f3xx-hal = { git = "https://github.com/stm32-rs/stm32f3xx-hal", optional = true }
+stm32f3xx-hal = { git = "https://github.com/Sh3Rm4n/stm32f3xx-hal", optional = true, branch = "pac-upgrade" }
+stm32f4xx-hal = { git = "https://github.com/stm32-rs/stm32f4xx-hal", optional = true } #conflict using newer version of cortex-m-rt
 stm32f7xx-hal = { git = "https://github.com/stm32-rs/stm32f7xx-hal", optional = true }
-#stm32f7xx-hal = { git = "https://github.com/pdgilbert/stm32f7xx-hal", branch="test-bxcan-version-relax", optional = true }
 stm32h7xx-hal = { git = "https://github.com/stm32-rs/stm32h7xx-hal", optional = true }
-stm32l0xx-hal = { git = "https://github.com/stm32-rs/stm32l0xx-hal", optional = true }
-stm32l1xx-hal = { git = "https://github.com/stm32-rs/stm32l1xx-hal", optional = true, default-features = false}
+#stm32l0xx-hal = { git = "https://github.com/stm32-rs/stm32l0xx-hal", optional = true }
+#stm32l1xx-hal = { git = "https://github.com/stm32-rs/stm32l1xx-hal", optional = true, default-features = false}
+stm32l1xx-hal = { git = "https://github.com/TheCallSign/stm32l1xx-hal", optional = true, default-features = false}
 stm32l4xx-hal = { git = "https://github.com/stm32-rs/stm32l4xx-hal", optional = true }
 
 # for bugs and unusual return values in some hals
 void          = { version = ">=1.0.2", default-features = false }
 
-#heapless = ">=0.4.3"
 heapless = ">=0.7"
 
 cortex-m-semihosting = { version = ">=0.3.3" }
@@ -101,10 +88,10 @@ panic-semihosting    = { version = ">=0.5.2" }
 stm32f0xx = []
 stm32f1xx = []
 stm32f3xx = []
-#stm32f4xx = []
+stm32f4xx = []
 stm32f7xx = []
 stm32h7xx = []
-stm32l0xx = []
+#stm32l0xx = []
 stm32l1xx = []
 stm32l4xx = []
 #device-selected = []
@@ -115,13 +102,13 @@ stm32f100 = ["stm32f1xx-hal/stm32f100", "stm32f1xx-hal/rt"]
 stm32f101 = ["stm32f1xx-hal/stm32f101", "stm32f1xx-hal/rt"]
 stm32f103 = ["stm32f1xx-hal/stm32f103", "stm32f1xx-hal/rt"]
 stm32f303xc = ["stm32f3xx-hal/stm32f303xc", "stm32f3xx-hal/rt"] 
-#stm32f401 = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
-#stm32f405 = ["stm32f4xx-hal/stm32f405", "stm32f4xx-hal/rt"] 
-#stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
+stm32f401 = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
+stm32f405 = ["stm32f4xx-hal/stm32f405", "stm32f4xx-hal/rt"] 
+stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
 stm32f722 = ["stm32f7xx-hal/stm32f722", "stm32f7xx-hal/rt"] 
 stm32h742 = ["stm32h7xx-hal/stm32h742", "stm32h7xx-hal/rt"]
 # see https://www.st.com/resource/en/datasheet/stm32l072v8.pdf  p12 for some MCU variants
-stm32l0x2 = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
+#stm32l0x2 = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
 #stm32l0x1 = ["stm32l0xx-hal/stm32l0x1", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L071KBTx"]
 stm32l100 = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
 stm32l151 = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]
