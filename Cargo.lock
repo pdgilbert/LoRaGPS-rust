@@ -995,9 +995,10 @@ dependencies = [
 [[package]]
 name = "stm32f3xx-hal"
 version = "0.8.1"
-source = "git+https://github.com/Sh3Rm4n/stm32f3xx-hal?branch=pac-upgrade#9e59ee1ad280609c48e3361cc9f82a7ac6285c05"
+source = "git+https://github.com/stm32-rs/stm32f3xx-hal#26a531aba4a41cecc9a1594e3d2c3c00016a7cf8"
 dependencies = [
- "bxcan 0.5.1",
+ "bare-metal 0.2.5",
+ "bxcan 0.6.2",
  "cfg-if",
  "cortex-m 0.7.3",
  "cortex-m-rt",
