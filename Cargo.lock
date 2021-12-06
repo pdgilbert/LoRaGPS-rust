@@ -233,7 +233,7 @@ version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bffa6c1454368a6aa4811ae60964c38e6996d397ff8095a8b9211b1c1f749bc"
 dependencies = [
- "cortex-m 0.7.3",
+ "cortex-m 0.5.11",
 ]
 
 [[package]]
@@ -718,7 +718,7 @@ version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d55dedd501dfd02514646e0af4d7016ce36bc12ae177ef52056989966a1eec"
 dependencies = [
- "cortex-m 0.7.3",
+ "cortex-m 0.5.11",
  "cortex-m-semihosting",
 ]
 
@@ -1030,7 +1030,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.10.1"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#a8dd1fdc13c6084965ce61fc3cfa312e97598eef"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#d1123d896feabecb17148423e05a1495782484bd"
 dependencies = [
  "bare-metal 1.0.0",
  "cast 0.3.0",
