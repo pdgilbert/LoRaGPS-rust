@@ -58,7 +58,7 @@ embedded-hal-compat = { version = "0.4.0, <0.5.0"}
 #radio-sx127x  = { version = "0.11.0", default-features = false }
 #radio-sx127x  = { version = "0.12.0", default-features = false }
 radio-sx127x  = {  git = "https://github.com/rust-iot/rust-radio-sx127x", default-features = false }
-radio         = { version = "0.9.1" }
+radio         = { version = "0.10.0" }
 #radio         = {  git = "https://github.com/rust-iot/radio-hal", default-features = false }
 
 #driver-pal does not need to be specified
