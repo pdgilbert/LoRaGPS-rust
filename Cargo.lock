@@ -33,7 +33,7 @@ version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a785a543aea40f5e4e2e93bb2655d31bc21bb391fff65697150973e383f16bb"
 dependencies = [
- "as-slice",
+ "as-slice 0.1.5",
 ]
 
 [[package]]
@@ -45,6 +45,15 @@ dependencies = [
  "generic-array 0.12.4",
  "generic-array 0.13.3",
  "generic-array 0.14.4",
+ "stable_deref_trait",
+]
+
+[[package]]
+name = "as-slice"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "516b6b4f0e40d50dcda9365d53964ec74560ad4284da2e7fc97122cd83174516"
+dependencies = [
  "stable_deref_trait",
 ]
 
@@ -250,9 +259,9 @@ dependencies = [
 
 [[package]]
 name = "darling"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "757c0ded2af11d8e739c4daea1ac623dd1624b06c844cf3f5a39f1bdbd99bb12"
+checksum = "d0d720b8683f8dd83c65155f0530560cba68cd2bf395f6513a483caee57ff7f4"
 dependencies = [
  "darling_core",
  "darling_macro",
@@ -260,9 +269,9 @@ dependencies = [
 
 [[package]]
 name = "darling_core"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c34d8efb62d0c2d7f60ece80f75e5c63c1588ba68032740494b0b9a996466e3"
+checksum = "7a340f241d2ceed1deb47ae36c4144b2707ec7dd0b649f894cb39bb595986324"
 dependencies = [
  "fnv",
  "ident_case",
@@ -274,9 +283,9 @@ dependencies = [
 
 [[package]]
 name = "darling_macro"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ade7bff147130fe5e6d39f089c6bd49ec0250f35d70b2eebf72afdfc919f15cc"
+checksum = "72c41b3b7352feb3211a0d743dc5700a4e3b60f51bd2b368892d1e0f9a95f44b"
 dependencies = [
  "darling_core",
  "quote",
@@ -349,15 +358,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "driver-pal"
-version = "0.8.0-alpha.5"
-source = "git+https://github.com/ryankurte/rust-driver-pal/#ae3e02f31faa3dcc322ceddf33007cd90db7737b"
-dependencies = [
- "embedded-hal 1.0.0-alpha.5",
- "log",
-]
-
-[[package]]
 name = "embedded-can"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -385,7 +385,7 @@ dependencies = [
  "byteorder",
  "embedded-graphics-core",
  "float-cmp",
- "micromath",
+ "micromath 1.1.1",
 ]
 
 [[package]]
@@ -551,9 +551,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.109"
+version = "0.2.111"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f98a04dce437184842841303488f70d0188c5f51437d2a834dc097eafa909a01"
+checksum = "8e167738f1866a7ec625567bae89ca0d44477232a4f7c52b1c7f2adc2c98804f"
 
 [[package]]
 name = "lock_api"
@@ -581,7 +581,6 @@ dependencies = [
  "cortex-m 0.7.3",
  "cortex-m-rt",
  "cortex-m-semihosting",
- "driver-pal 0.8.0-alpha.5 (git+https://github.com/ryankurte/rust-driver-pal/)",
  "embedded-graphics",
  "embedded-hal 0.2.6",
  "embedded-hal 1.0.0-alpha.5",
@@ -618,6 +617,12 @@ name = "micromath"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc4010833aea396656c2f91ee704d51a6f1329ec2ab56ffd00bfd56f7481ea94"
+
+[[package]]
+name = "micromath"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39617bc909d64b068dcffd0e3e31679195b5576d0c83fadc52690268cc2b2b55"
 
 [[package]]
 name = "nb"
@@ -730,9 +735,9 @@ checksum = "0744126afe1a6dd7f394cb50a716dbe086cb06e255e53d8d0185d82828358fb5"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.32"
+version = "1.0.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba508cc11742c0dc5c1659771673afbab7a0efab23aa17e854cbab0837ed0b43"
+checksum = "fb37d2df5df740e582f28f8560cf425f52bb267d872fe58358eadb554909f07a"
 dependencies = [
  "unicode-xid",
 ]
@@ -764,7 +769,7 @@ version = "0.13.0"
 source = "git+https://github.com/rust-iot/rust-radio-sx127x#8188c20c89603dbda9592c40a8e3fc5b37769a00"
 dependencies = [
  "bitflags",
- "driver-pal 0.8.0-alpha.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "driver-pal",
  "embedded-hal 1.0.0-alpha.5",
  "libc",
  "log",
@@ -1030,7 +1035,7 @@ dependencies = [
 [[package]]
 name = "stm32f4xx-hal"
 version = "0.10.1"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#a8dd1fdc13c6084965ce61fc3cfa312e97598eef"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#9424a37234493eb2c71c700a410cadaa8df8f767"
 dependencies = [
  "bare-metal 1.0.0",
  "cast 0.3.0",
@@ -1061,21 +1066,21 @@ dependencies = [
 [[package]]
 name = "stm32f7xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32f7xx-hal#10eaaf32d9f190cc5efc6ff22215b560ab236c88"
+source = "git+https://github.com/stm32-rs/stm32f7xx-hal#d632a5c228a14e272bb9c3497ba15e2682ad4aef"
 dependencies = [
- "as-slice",
- "bare-metal 0.2.5",
+ "as-slice 0.2.1",
+ "bare-metal 1.0.0",
  "bxcan 0.6.2",
- "cast 0.2.7",
+ "cast 0.3.0",
  "cortex-m 0.7.3",
  "cortex-m-rt",
  "embedded-hal 0.2.6",
  "embedded-time",
- "micromath",
- "nb 0.1.3",
+ "micromath 2.0.0",
+ "nb 1.0.0",
  "rand_core",
- "rtcc",
  "stm32f7",
+ "time",
  "void",
 ]
 
@@ -1094,7 +1099,7 @@ dependencies = [
 [[package]]
 name = "stm32h7xx-hal"
 version = "0.10.0"
-source = "git+https://github.com/stm32-rs/stm32h7xx-hal#01e73815054f457131d26326bd27570046ce2485"
+source = "git+https://github.com/stm32-rs/stm32h7xx-hal#cd09880208a6d2a1ac5f77305fe687e1a49db8ea"
 dependencies = [
  "bare-metal 1.0.0",
  "cast 0.3.0",
@@ -1149,7 +1154,7 @@ dependencies = [
 [[package]]
 name = "stm32l4xx-hal"
 version = "0.6.0"
-source = "git+https://github.com/stm32-rs/stm32l4xx-hal#fdb39efb4c5ac0253ae816ce7460a54e49641b41"
+source = "git+https://github.com/stm32-rs/stm32l4xx-hal#0e661138a5f4ebc255550438444ac8c2d7dfd0d1"
 dependencies = [
  "bxcan 0.6.2",
  "cast 0.2.7",
@@ -1178,6 +1183,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-xid",
+]
+
+[[package]]
+name = "time"
+version = "0.3.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41effe7cfa8af36f439fac33861b66b049edc6f9a32331e2312660529c1c24ad"
+dependencies = [
+ "libc",
 ]
 
 [[package]]

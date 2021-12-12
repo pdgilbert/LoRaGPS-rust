@@ -46,10 +46,12 @@ shared-bus = { version = ">=0.1.4", features = ["cortexm"] }
 embedded-spi = { version = ">=0.6", default-features = false }
 
 # for radio-sx127x which uses embedded-hal 1.0.0-alpha while device crates still use 0.2.x
+
+
 embedded-hal = { version = "1.0.0-alpha.5,<1.0.0-alpha.6" }  
 old-e-h      = { version = "0.2.6", package = "embedded-hal" }
 
-embedded-hal-compat = "0.4.0" 
+embedded-hal-compat = { version = "0.4.0, <0.5.0"}
 
 #radio-sx127x  = {  git = "https://github.com/pdgilbert/rust-radio-sx127x", default-features = false }
 
@@ -59,9 +61,9 @@ radio-sx127x  = {  git = "https://github.com/rust-iot/rust-radio-sx127x", defaul
 radio         = { version = "0.9.1" }
 #radio         = {  git = "https://github.com/rust-iot/radio-hal", default-features = false }
 
-
+#driver-pal does not need to be specified
 #driver-pal   = { version = "0.8.0-alpha.3", default-features = false }
-driver-pal   = { git = "https://github.com/ryankurte/rust-driver-pal/", default-features = false } # 0.8.0-alpha5
+#driver-pal   = { git = "https://github.com/ryankurte/rust-driver-pal/", default-features = false } # 0.8.0-alpha5
 
 stm32f0xx-hal = { git = "https://github.com/stm32-rs/stm32f0xx-hal", optional = true }
 stm32f1xx-hal = { git = "https://github.com/stm32-rs/stm32f1xx-hal", optional = true }
@@ -85,35 +87,36 @@ panic-semihosting    = { version = ">=0.5.2" }
 #[dev-dependencies]
 
 [features]
-stm32f0xx = []
-stm32f1xx = []
-stm32f3xx = []
-stm32f4xx = []
-stm32f7xx = []
-stm32h7xx = []
-#stm32l0xx = []
-stm32l1xx = []
-stm32l4xx = []
+stm32f0xx = ["stm32f0xx-hal/rt"]
+stm32f1xx = ["stm32f1xx-hal/rt"]
+stm32f3xx = ["stm32f3xx-hal/rt"]
+stm32f4xx = ["stm32f4xx-hal/rt"]
+stm32f7xx = ["stm32f7xx-hal/rt"]
+stm32h7xx = ["stm32h7xx-hal/rt"]
+#stm32l0xx = ["stm32l0xx-hal/rt"]
+stm32l1xx = ["stm32l1xx-hal/rt"]
+stm32l4xx = ["stm32l4xx-hal/rt"]
 #device-selected = []
 #doc = []
-stm32f030xc = ["stm32f0xx-hal/stm32f030xc", "stm32f0xx-hal/rt"]
-stm32f042   = ["stm32f0xx-hal/stm32f042",   "stm32f0xx-hal/rt"]
-stm32f100 = ["stm32f1xx-hal/stm32f100", "stm32f1xx-hal/rt"]
-stm32f101 = ["stm32f1xx-hal/stm32f101", "stm32f1xx-hal/rt"]
-stm32f103 = ["stm32f1xx-hal/stm32f103", "stm32f1xx-hal/rt"]
-stm32f303xc = ["stm32f3xx-hal/stm32f303xc", "stm32f3xx-hal/rt"] 
-stm32f401 = ["stm32f4xx-hal/stm32f401", "stm32f4xx-hal/rt"] 
-stm32f405 = ["stm32f4xx-hal/stm32f405", "stm32f4xx-hal/rt"] 
-stm32f411 = ["stm32f4xx-hal/stm32f411", "stm32f4xx-hal/rt"] 
-stm32f722 = ["stm32f7xx-hal/stm32f722", "stm32f7xx-hal/rt"] 
-stm32h742 = ["stm32h7xx-hal/stm32h742", "stm32h7xx-hal/rt"]
+stm32f030xc = ["stm32f0xx-hal/stm32f030xc"]
+stm32f042   = ["stm32f0xx-hal/stm32f042"]
+stm32f100   = ["stm32f1xx-hal/stm32f100"]
+stm32f101   = ["stm32f1xx-hal/stm32f101"]
+stm32f103   = ["stm32f1xx-hal/stm32f103"]
+stm32f303xc = ["stm32f3xx-hal/stm32f303xc"] 
+stm32f401   = ["stm32f4xx-hal/stm32f401"] 
+stm32f405   = ["stm32f4xx-hal/stm32f405"] 
+stm32f411   = ["stm32f4xx-hal/stm32f411"] 
+stm32f722   = ["stm32f7xx-hal/stm32f722"] 
+stm32h742   = ["stm32h7xx-hal/stm32h742"]
 # see https://www.st.com/resource/en/datasheet/stm32l072v8.pdf  p12 for some MCU variants
-#stm32l0x2 = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L072KZTx"]
-#stm32l0x1 = ["stm32l0xx-hal/stm32l0x1", "stm32l0xx-hal/rt", "stm32l0xx-hal/mcu-STM32L071KBTx"]
-stm32l100 = ["stm32l1xx-hal/stm32l100", "stm32l1xx-hal/rt"]
-stm32l151 = ["stm32l1xx-hal/stm32l151", "stm32l1xx-hal/rt"]
-stm32l4x1 = ["stm32l4xx-hal/stm32l4x1", "stm32l4xx-hal/rt"]
-stm32l4x2 = ["stm32l4xx-hal/stm32l4x2", "stm32l4xx-hal/rt"]
+#stm32l0x2  = ["stm32l0xx-hal/stm32l0x2", "stm32l0xx-hal/mcu-STM32L072KZTx"]
+#stm32l0x1  = ["stm32l0xx-hal/stm32l0x1", "stm32l0xx-hal/mcu-STM32L071KBTx"]
+stm32l100   = ["stm32l1xx-hal/stm32l100"]
+stm32l151   = ["stm32l1xx-hal/stm32l151"]
+stm32l471   = ["stm32l4xx-hal/stm32l471"]
+stm32l422   = ["stm32l4xx-hal/stm32l422"]
+stm32l486   = ["stm32l4xx-hal/stm32l486"]
 
 [profile.dev]
 incremental = false
