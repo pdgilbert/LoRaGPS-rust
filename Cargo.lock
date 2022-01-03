@@ -242,7 +242,7 @@ version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bffa6c1454368a6aa4811ae60964c38e6996d397ff8095a8b9211b1c1f749bc"
 dependencies = [
- "cortex-m 0.7.3",
+ "cortex-m 0.5.11",
 ]
 
 [[package]]
@@ -484,9 +484,21 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "fugit"
-version = "0.3.0"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e4508138d453a72fc32ff5b12f69ddcf14bac0b020445305ba623755deb9dbd"
+checksum = "22e489f95411a50db661b18e072459bbdc084de522a8530e4709bef593bf3c18"
+dependencies = [
+ "gcd",
+]
+
+[[package]]
+name = "gcd"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f37978dab2ca789938a83b2f8bc1ef32db6633af9051a6cd409eff72cbaaa79a"
+dependencies = [
+ "paste",
+]
 
 [[package]]
 name = "generic-array"
@@ -723,7 +735,7 @@ version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d55dedd501dfd02514646e0af4d7016ce36bc12ae177ef52056989966a1eec"
 dependencies = [
- "cortex-m 0.7.3",
+ "cortex-m 0.5.11",
  "cortex-m-semihosting",
 ]
 
@@ -1034,8 +1046,8 @@ dependencies = [
 
 [[package]]
 name = "stm32f4xx-hal"
-version = "0.10.1"
-source = "git+https://github.com/stm32-rs/stm32f4xx-hal#9424a37234493eb2c71c700a410cadaa8df8f767"
+version = "0.11.1"
+source = "git+https://github.com/stm32-rs/stm32f4xx-hal#d96137099d47112bf891d72df1c066409afacb4e"
 dependencies = [
  "bare-metal 1.0.0",
  "cast 0.3.0",
