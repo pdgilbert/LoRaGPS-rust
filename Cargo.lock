@@ -353,7 +353,7 @@ version = "0.8.0-alpha.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a573e04245e4e5db4acf120972ca90e1af82a1c9bd9e15078c875888a341c272"
 dependencies = [
- "embedded-hal 1.0.0-alpha.5",
+ "embedded-hal 1.0.0-alpha.8",
  "log",
 ]
 
@@ -410,9 +410,9 @@ dependencies = [
 
 [[package]]
 name = "embedded-hal"
-version = "1.0.0-alpha.5"
+version = "1.0.0-alpha.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a554c04648665230499563ccdfd1fcd719ef2d5a0af54bdc81c5d877fb556db4"
+checksum = "c3babfc7fd332142a0b11aebf592992f211f4e01b6222fb04b03aba1bd80018d"
 dependencies = [
  "nb 1.0.0",
 ]
@@ -424,7 +424,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8e04c6fdcffda5f8b2886e5f90a55e0ee8932a91cf13089d5b3a6954ff33ac22"
 dependencies = [
  "embedded-hal 0.2.6",
- "embedded-hal 1.0.0-alpha.5",
+ "embedded-hal 1.0.0-alpha.8",
 ]
 
 [[package]]
@@ -583,7 +583,7 @@ dependencies = [
  "cortex-m-semihosting",
  "embedded-graphics",
  "embedded-hal 0.2.6",
- "embedded-hal 1.0.0-alpha.5",
+ "embedded-hal 1.0.0-alpha.8",
  "embedded-hal-compat",
  "embedded-spi",
  "heapless",
@@ -758,7 +758,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2daa60788f83f8fa18976bca4712abd321056efbf26b4336b979c709dcae5e89"
 dependencies = [
  "chrono",
- "embedded-hal 1.0.0-alpha.5",
+ "embedded-hal 1.0.0-alpha.8",
  "log",
  "nb 1.0.0",
 ]
@@ -770,7 +770,7 @@ source = "git+https://github.com/rust-iot/rust-radio-sx127x#8188c20c89603dbda959
 dependencies = [
  "bitflags",
  "driver-pal",
- "embedded-hal 1.0.0-alpha.5",
+ "embedded-hal 1.0.0-alpha.8",
  "libc",
  "log",
  "radio",
